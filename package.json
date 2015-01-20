@@ -1,5 +1,9 @@
 {
   "name": "alfred-workflow-nodejs",
+  "repository": {
+    "type": "git",
+    "url": "git@bitbucket.org:giangvo_Atlassian/alfred-workflow-nodejs.git"
+  },
   "dependencies": {
     "xmlbuilder": "*",
     "node-persist": "*"
