@@ -41,6 +41,10 @@ var Storage = (function() {
 
         remove: function(key) {
             storage.removeItem(key);
+        },
+
+        clear: function() {
+            storage.clear();
         }
     };
 })();
@@ -49,7 +53,11 @@ var Workflow = (function() {
     var _items = [];
     return {
         addItem: function(item) {
-            _items.push(item.feeback());
+            _items.push(item.feedback());
+        },
+
+        clearItems: function() {
+            _items = [];
         },
 
         feedback: function() {
@@ -61,7 +69,9 @@ var Workflow = (function() {
             var ele = root.ele({
                 items: _items
             });
-            console.log(ele.end());
+            var ret = ele.end();
+            console.log(ret);
+            return ret;
         }
     };
 })();
@@ -75,7 +85,7 @@ function Item(data) {
     }
 }
 
-Item.prototype.feeback = function() {
+Item.prototype.feedback = function() {
     var item = _removeEmptyProperties({
         "@uid": this.uid,
         "@arg": this.arg,
