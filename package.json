@@ -11,7 +11,8 @@
   "dependencies": {
     "node-persist": "*",
     "request": "^2.51.0",
-    "xmlbuilder": "*"
+    "xmlbuilder": "*",
+    "fuzzy": "*"
   },
   "devDependencies": {
     "chai": "^1.10.0",
