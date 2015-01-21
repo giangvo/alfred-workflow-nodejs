@@ -1,11 +1,58 @@
-// var request = require('request');
-// request('http://www.google.com', function(error, response, body) {
-//     if (!error && response.statusCode == 200) {
+// === WorkFlow ===
+var Workflow = (function() {
+    var _items = [];
+    return {
+        addItem: function(item) {
+            _items.push(item.feedback());
+        },
 
+        clearItems: function() {
+            _items = [];
+        },
 
-//     }
-// })
+        feedback: function() {
+            var root = require('xmlbuilder').create('root', {
+                version: '1.0',
+                encoding: 'UTF-8'
+            });
 
+            var ele = root.ele({
+                items: _items
+            });
+            var ret = ele.end();
+            console.log(ret);
+            return ret;
+        }
+    };
+})();
+
+// === Item ===
+function Item(data) {
+    // ignore empty value
+    data = _removeEmptyProperties(data);
+
+    for (var key in data) {
+        this[key] = data[key];
+    }
+}
+
+Item.prototype.feedback = function() {
+    var item = _removeEmptyProperties({
+        "@uid": this.uid,
+        "@arg": this.arg,
+        "@valid": this.valid === true ? "YES" : "NO",
+        "@autocomplete": this.autocomplete,
+        "title": this.title,
+        "subtile": this.subtile,
+        "icon": this.icon
+    });
+
+    return {
+        item: item
+    };
+};
+
+// === Storage
 var Storage = (function() {
     var storage = require('node-persist');
     storage.initSync();
@@ -49,58 +96,27 @@ var Storage = (function() {
     };
 })();
 
-var Workflow = (function() {
-    var _items = [];
+// === Utils
+var Utils = (function() {
+    var fuzzy = require('fuzzy');
     return {
-        addItem: function(item) {
-            _items.push(item.feedback());
-        },
+        filter: function(query, list, keyBuilder) {
+            if (!query) {
+                return list;
+            }
 
-        clearItems: function() {
-            _items = [];
-        },
+            var options = {
+                extract: keyBuilder
+            };
 
-        feedback: function() {
-            var root = require('xmlbuilder').create('root', {
-                version: '1.0',
-                encoding: 'UTF-8'
+            return fuzzy.filter(query, list, options).map(function(item) {
+                return item.original;
             });
-
-            var ele = root.ele({
-                items: _items
-            });
-            var ret = ele.end();
-            console.log(ret);
-            return ret;
         }
     };
 })();
 
-function Item(data) {
-    // ignore empty value
-    data = _removeEmptyProperties(data);
-
-    for (var key in data) {
-        this[key] = data[key];
-    }
-}
-
-Item.prototype.feedback = function() {
-    var item = _removeEmptyProperties({
-        "@uid": this.uid,
-        "@arg": this.arg,
-        "@valid": this.valid === true ? "YES" : "NO",
-        "@autocomplete": this.autocomplete,
-        "title": this.title,
-        "subtile": this.subtile,
-        "icon": this.icon
-    });
-
-    return {
-        item: item
-    };
-};
-
+// === private functions
 function _removeEmptyProperties(data) {
     for (var key in data) {
         var value = data[key];
@@ -112,8 +128,10 @@ function _removeEmptyProperties(data) {
     return data;
 }
 
+// module export
 module.exports = {
     storage: Storage,
     workflow: Workflow,
-    Item: Item
+    Item: Item,
+    utils: Utils
 };

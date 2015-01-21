@@ -46,7 +46,7 @@ suite("#WorkflowTest", function() {
     });
 
     it("generate empty feeback", function() {
-        var expectedObj =  '<?xml version="1.0" encoding="UTF-8"?><root><items/></root>';
+        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items/></root>';
 
         var ret = workflow.feedback();
 
@@ -146,5 +146,34 @@ suite("#StorageTest", function() {
 
         var obj2 = storage.get("key");
         should.not.exist(obj2);
+    });
+});
+
+
+suite("#Utils test", function() {
+    var Utils = AlfredNode.utils;
+    it("test filter 1", function() {
+        var list = [{
+            key: "1",
+            name: "This is a pencil"
+        }, {
+            key: "2",
+            name: "This is a pen"
+        }];
+
+        var keyBuilder = function(item) {
+            return item.name;
+        };
+
+        var results = Utils.filter("this is", list, keyBuilder);
+        assert.strictEqual(results.length, 2);
+        assert.strictEqual(results[0].key, "1");
+
+        var results = Utils.filter("pencil", list, keyBuilder);
+        assert.strictEqual(results.length, 1);
+        assert.strictEqual(results[0].key, "1");
+
+        var results = Utils.filter("abcdef", list, keyBuilder);
+        assert.strictEqual(results.length, 0);
     });
 });
