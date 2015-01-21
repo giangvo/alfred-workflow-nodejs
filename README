@@ -1,1 +1,22 @@
 Alfred Workflow Nodejs Lib
+=========
+
+A small library providing utility methods to `escape` and `unescape` HTML entities
+
+## Installation
+
+  npm install alfred-workflow-nodejs --save
+
+## Usage
+
+    To be updated
+## Tests
+
+  npm test
+
+## Contributing
+
+
+## Release History
+
+* 0.0.1 Initial release

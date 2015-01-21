@@ -1,12 +1,17 @@
 {
   "name": "alfred-workflow-nodejs",
+  "version": "0.0.1",
+  "description": "Alfred workflow nodejs module",
+  "author": "Giang Vo",
+  "main": "alfredNode.js",
   "repository": {
     "type": "git",
     "url": "git@bitbucket.org:giangvo_Atlassian/alfred-workflow-nodejs.git"
   },
   "dependencies": {
-    "xmlbuilder": "*",
-    "node-persist": "*"
+    "node-persist": "*",
+    "request": "^2.51.0",
+    "xmlbuilder": "*"
   },
   "devDependencies": {
     "chai": "^1.10.0",
