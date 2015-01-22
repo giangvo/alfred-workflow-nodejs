@@ -1,21 +1,31 @@
 Alfred Workflow Nodejs Lib
 =========
 
-A small library providing utility methods to `escape` and `unescape` HTML entities
+A small library providing helpers to create Alfred Workflow
 
 ## Installation
 
-  npm install alfred-workflow-nodejs --save
+  npm install alfred-workflow-nodejs
 
 ## Usage
-    Workflow.setName("your unit workflow name");
-    To be updated
+    # import AlfredNode instance
+    var AlfredNode = require('alfred-workflow-nodejs');
+
+    # get instance of workflow and Item class
+    var workflow = AlfredNode.workflow;
+    workflow.setName("bamboo-alfred-workflow");
+    var Item = AlfredNode.Item;
+
+    # get other helpers
+    var storage = AlfredNode.storage;
+    var utils = AlfredNode.utils;
+    var settings = AlfredNode.settings;
+
+##
+
 ## Tests
 
   npm test
-
-## Contributing
-
 
 ## Release History
 
