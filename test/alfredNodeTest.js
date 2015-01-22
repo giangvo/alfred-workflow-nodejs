@@ -165,6 +165,12 @@ suite("#Settings test", function() {
         assert.isUndefined(Settings.get("username"));
     });
 
+    it("test clear setting", function() {
+        Settings.set("username", "user1");
+        Settings.clear();
+        assert.isUndefined(Settings.get("username"));
+    });
+
     it("test set password", function(done) {
         Settings.setPassword("user1", "mypass");
         Settings.getPassword("user1", function(error, password) {

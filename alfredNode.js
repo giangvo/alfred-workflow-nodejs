@@ -90,6 +90,8 @@ var Storage = (function() {
                     var now = new Date().getTime();
                     if (now - timestamp < ttl) {
                         return obj.data;
+                    } else {
+                        storage.removeItem(key, function() {});
                     }
                 }
             }
@@ -131,6 +133,10 @@ var Settings = (function() {
             if (settings) {
                 delete settings.key;
             }
+        },
+
+        clear: function() {
+            Storage.remove("settings");
         },
 
         setPassword: function(username, password) {
