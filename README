@@ -9,23 +9,44 @@ A small library providing helpers to create Alfred Workflow
 
 ## Usage
     # import AlfredNode instance
+    ```
     var AlfredNode = require('alfred-workflow-nodejs');
+    ```
 
     # get instance of workflow and Item class
+    ```
     var workflow = AlfredNode.workflow;
-    workflow.setName("bamboo-alfred-workflow");
+    workflow.setName("example-alfred-workflow");
     var Item = AlfredNode.Item;
-
-    # get other helpers
+    
+    # other helpers
+    ```
     var storage = AlfredNode.storage;
     var utils = AlfredNode.utils;
     var settings = AlfredNode.settings;
-
-##
+    ```
 
 ## Tests
 
   npm test
+
+## Documents
+    # Workflow and Item: generating feedbacks
+    - 
+
+    - Example
+    ```
+    var workflow = AlfredNode.workflow;
+    workflow.setName("example-alfred-workflow");
+    var Item = AlfredNode.Item;
+    
+    var item1 = new Item({title: "item 1", subtile: "sub 1"});
+    var item2 = new Item({title: "item 1", subtile: "sub 1", valid: true, icon: "icon.png", arg: "arg", uid: "uid", autocomplete: "autocomplete"});
+    workflow.addItem(item1);
+    workflow.addItem(item2);
+    workflow.feedback();
+
+    ```
 
 ## Release History
 
