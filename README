@@ -8,7 +8,7 @@ A small library providing utility methods to `escape` and `unescape` HTML entiti
   npm install alfred-workflow-nodejs --save
 
 ## Usage
-
+    Workflow.setName("your unit workflow name");
     To be updated
 ## Tests
 

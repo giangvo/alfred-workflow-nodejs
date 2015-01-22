@@ -1,7 +1,16 @@
 // === WorkFlow ===
 var Workflow = (function() {
     var _items = [];
+    var _name = "AlfredWfNodeJs";
     return {
+        setName: function(name) {
+            _name = name;
+        },
+
+        getName: function() {
+            return _name;
+        },
+
         addItem: function(item) {
             _items.push(item.feedback());
         },
@@ -43,7 +52,7 @@ Item.prototype.feedback = function() {
         "@valid": this.valid === true ? "YES" : "NO",
         "@autocomplete": this.autocomplete,
         "title": this.title,
-        "subtile": this.subtile,
+        "subtitle": this.subtitle,
         "icon": this.icon
     });
 
@@ -87,11 +96,58 @@ var Storage = (function() {
         },
 
         remove: function(key) {
-            storage.removeItem(key);
+            if (storage.getItem(key)) {
+                storage.removeItem(key, function() {});
+            }
         },
 
         clear: function() {
             storage.clear();
+        }
+    };
+})();
+
+// === Settings
+var Settings = (function() {
+    var keychain = require('keychain');
+
+    return {
+        set: function(key, value) {
+            var settings = Storage.get("settings");
+            settings = settings || {};
+            settings.key = value;
+            Storage.set("settings", settings);
+        },
+
+        get: function(key) {
+            var settings = Storage.get("settings");
+            if (settings) {
+                return settings.key;
+            }
+        },
+
+        remove: function(key) {
+            var settings = Storage.get("settings");
+            if (settings) {
+                delete settings.key;
+            }
+        },
+
+        setPassword: function(username, password) {
+            keychain.setPassword({
+                account: username,
+                service: Workflow.getName(),
+                password: password
+            }, function(err) {
+                console.log(err);
+            });
+        },
+
+        getPassword: function(username, callback) {
+            keychain.getPassword({
+                account: username,
+                service: Workflow.getName()
+            }, callback);
         }
     };
 })();
@@ -132,6 +188,7 @@ function _removeEmptyProperties(data) {
 module.exports = {
     storage: Storage,
     workflow: Workflow,
+    settings: Settings,
     Item: Item,
     utils: Utils
 };

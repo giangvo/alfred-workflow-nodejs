@@ -9,10 +9,11 @@
     "url": "git@bitbucket.org:giangvo_Atlassian/alfred-workflow-nodejs.git"
   },
   "dependencies": {
+    "fuzzy": "*",
+    "keychain": "0.0.4",
     "node-persist": "*",
     "request": "^2.51.0",
-    "xmlbuilder": "*",
-    "fuzzy": "*"
+    "xmlbuilder": "*"
   },
   "devDependencies": {
     "chai": "^1.10.0",

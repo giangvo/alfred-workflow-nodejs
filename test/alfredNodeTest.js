@@ -150,6 +150,30 @@ suite("#StorageTest", function() {
 });
 
 
+suite("#Settings test", function() {
+    var Settings = AlfredNode.settings;
+
+    it("test set + get setting", function() {
+        Settings.set("username", "user1");
+        var username = Settings.get("username");
+        assert.strictEqual(username, "user1");
+    });
+
+    it("test remove setting", function() {
+        Settings.set("username", "user1");
+        Settings.remove("username");
+        assert.isUndefined(Settings.get("username"));
+    });
+
+    it("test set password", function(done) {
+        Settings.setPassword("user1", "mypass");
+        Settings.getPassword("user1", function(error, password) {
+            assert.strictEqual(password, "mypass");
+            done();
+        });
+    });
+});
+
 suite("#Utils test", function() {
     var Utils = AlfredNode.utils;
     it("test filter 1", function() {
@@ -169,11 +193,11 @@ suite("#Utils test", function() {
         assert.strictEqual(results.length, 2);
         assert.strictEqual(results[0].key, "1");
 
-        var results = Utils.filter("pencil", list, keyBuilder);
+        results = Utils.filter("pencil", list, keyBuilder);
         assert.strictEqual(results.length, 1);
         assert.strictEqual(results[0].key, "1");
 
-        var results = Utils.filter("abcdef", list, keyBuilder);
+        results = Utils.filter("abcdef", list, keyBuilder);
         assert.strictEqual(results.length, 0);
     });
 });
