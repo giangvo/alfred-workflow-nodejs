@@ -116,4 +116,4 @@ utils.filter("pen", [{name: "pencil"}, {name: "pen"}, {name: "book"}], function(
 ```
 
 ## Release History ##
-* 0.0.1 Initial release
+* 1.0 Initial release
