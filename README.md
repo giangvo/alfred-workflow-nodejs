@@ -2,11 +2,18 @@ Alfred Workflow Nodejs Library
 =========
 
 A small library providing helpers to create Alfred Workflow
-
 ## Installation ##
-  npm install "https://bitbucket.org/giangvo_Atlassian/alfred-workflow-nodejs/get/master.tar.gz"
+
+```
+#!bash
+npm install "https://bitbucket.org/giangvo_Atlassian/alfred-workflow-nodejs/get/master.tar.gz"
+```
 ## Tests ##
-  npm test
+
+```
+#!bash
+npm test
+```
 ## Usage ##
 ### Import AlfredNode instance ###
 ```
@@ -92,6 +99,7 @@ settings.getPassword("username", function(error, password){
   
 ### Utils - Helper functions###
 Some utilities
+
 * filter(query, list, keyBuilder) : filter list of object using fuzzy matching
     * query
     * list
