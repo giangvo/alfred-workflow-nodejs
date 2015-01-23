@@ -2,6 +2,11 @@ Alfred Workflow Nodejs Library
 =========
 
 A small library providing helpers to create Alfred Workflow
+
+* Workflow & Item - Helper to build and generate feedbacks
+* Storage - Helper to CRUD data
+* Settings - Helper to CRUD settings, store password securely
+* Utils 
 ## Installation ##
 
 ```
@@ -22,7 +27,7 @@ var AlfredNode = require('alfred-workflow-nodejs');
 ```
 
 ### Workflow and Item - Generate feedbacks ###
-* Workflow is used to build and generate list of feedbacks
+* Workflow is used to build and generate feedbacks
 
 ```
 #!javascript
