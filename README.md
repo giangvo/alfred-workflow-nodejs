@@ -71,7 +71,7 @@ storage.clear();
 ```
     
 ### Settings - APIs to CRUD settings ###
-A simple version of storage, settings are stored with key "settings"
+Helpers to store string key/value settings, store password into Mac keychain
 
 * set(key, value, [ttl])
     * key: string
@@ -79,7 +79,7 @@ A simple version of storage, settings are stored with key "settings"
 * get(key)
 * remove(key)
 * clear() : clear all settings, be carefull!!!
-* setPassword(username, password) : store password to Mac keychain Workflow name is used here as keychain service)
+* setPassword(username, password) : store password to Mac keychain (workflow name is used here as keychain service)
 * getPassword(username, callback(error,password)) : get password of username from Mac keychain
     * username
     * callback(error, password): callback function that is called after password is returned
