@@ -2,6 +2,11 @@ Alfred Workflow Nodejs Library
 =========
 
 A small library providing helpers to create Alfred Workflow
+
+* Workflow & Item - Helper to build and generate feedbacks
+* Storage - Helper to CRUD data
+* Settings - Helper to CRUD settings, store password securely
+* Utils 
 ## Installation ##
 
 ```
@@ -22,7 +27,7 @@ var AlfredNode = require('alfred-workflow-nodejs');
 ```
 
 ### Workflow and Item - Generate feedbacks ###
-* Workflow is used to build and generate list of feedbacks
+* Workflow is used to build and generate feedbacks
 
 ```
 #!javascript
@@ -72,7 +77,7 @@ storage.clear();
 ```
     
 ### Settings - APIs to CRUD settings ###
-A simple version of storage, settings are stored with key "settings"
+Helpers to store string key/value settings, store password into Mac keychain
 
 * set(key, value, [ttl])
     * key: string
@@ -80,7 +85,7 @@ A simple version of storage, settings are stored with key "settings"
 * get(key)
 * remove(key)
 * clear() : clear all settings, be carefull!!!
-* setPassword(username, password) : store password to Mac keychain Workflow name is used here as keychain service)
+* setPassword(username, password) : store password to Mac keychain (workflow name is used here as keychain service)
 * getPassword(username, callback(error,password)) : get password of username from Mac keychain
     * username
     * callback(error, password): callback function that is called after password is returned

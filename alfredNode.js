@@ -74,11 +74,11 @@ var Storage = (function() {
                 ttl: ttl || -1
             };
 
-            storage.setItem(key, obj);
+            storage.setItemSync(key, obj);
         },
 
         get: function(key) {
-            var obj = storage.getItem(key);
+            var obj = storage.getItemSync(key);
             if (obj) {
                 var ttl = obj.ttl;
                 var timestamp = obj.timestamp;
@@ -91,7 +91,7 @@ var Storage = (function() {
                     if (now - timestamp < ttl) {
                         return obj.data;
                     } else {
-                        storage.removeItem(key, function() {});
+                        storage.removeItemSync(key, function() {});
                     }
                 }
             }
@@ -99,12 +99,12 @@ var Storage = (function() {
 
         remove: function(key) {
             if (storage.getItem(key)) {
-                storage.removeItem(key, function() {});
+                storage.removeItemSync(key, function() {});
             }
         },
 
         clear: function() {
-            storage.clear();
+            storage.clearSync();
         }
     };
 })();
@@ -117,21 +117,21 @@ var Settings = (function() {
         set: function(key, value) {
             var settings = Storage.get("settings");
             settings = settings || {};
-            settings.key = value;
+            settings[key] = value;
             Storage.set("settings", settings);
         },
 
         get: function(key) {
             var settings = Storage.get("settings");
             if (settings) {
-                return settings.key;
+                return settings[key];
             }
         },
 
         remove: function(key) {
             var settings = Storage.get("settings");
             if (settings) {
-                delete settings.key;
+                delete settings[key];
             }
         },
 

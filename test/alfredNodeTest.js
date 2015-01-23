@@ -89,6 +89,10 @@ suite("#WorkflowTest", function() {
 });
 
 suite("#StorageTest", function() {
+    setup(function() {
+        storage.clear();
+    });
+
     it("test set and get item without ttl", function() {
         var obj = {
             text: "abc"
@@ -124,6 +128,22 @@ suite("#StorageTest", function() {
         should.not.exist(obj2);
     });
 
+    it("test set and get multiple items", function() {
+        var obj1 = {
+            text: "abc"
+        };
+
+        var obj2 = {
+            text: "abc"
+        };
+
+        storage.set("key1", obj1);
+        storage.set("key2", obj2);
+
+        obj1.should.equal(storage.get("key1"));
+        obj2.should.equal(storage.get("key2"));
+    });
+
     it("test remove item", function() {
         var obj = {
             text: "abc"
@@ -153,10 +173,23 @@ suite("#StorageTest", function() {
 suite("#Settings test", function() {
     var Settings = AlfredNode.settings;
 
+    setup(function() {
+        Settings.clear();
+    });
+
     it("test set + get setting", function() {
         Settings.set("username", "user1");
+
         var username = Settings.get("username");
         assert.strictEqual(username, "user1");
+    });
+
+    it("test set + get multiple settings", function() {
+        Settings.set("username", "user1");
+        Settings.set("password", "pass1");
+
+        assert.strictEqual("user1", Settings.get("username"));
+        assert.strictEqual("pass1", Settings.get("password"));
     });
 
     it("test remove setting", function() {
