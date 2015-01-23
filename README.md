@@ -12,6 +12,8 @@ A small library providing helpers to create Alfred Workflow
 ```
 #!bash
 npm install "https://bitbucket.org/giangvo_Atlassian/alfred-workflow-nodejs/get/master.tar.gz"
+or 
+npm install "alfred-workflow-nodejs"
 ```
 ## Tests ##
 
