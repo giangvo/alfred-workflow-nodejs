@@ -60,6 +60,7 @@ workflow.feedback();
 * get(key)
 * remove(key)
 * clear() : clear all data, be carefull!!!
+
 ```
 #!javascript
 var storage = AlfredNode.storage;
@@ -83,6 +84,7 @@ A simple version of storage, settings are stored with key "settings"
 * getPassword(username, callback(error,password)) : get password of username from Mac keychain
     * username
     * callback(error, password): callback function that is called after password is returned
+
 ```
 #!javascript
 var settings = AlfredNode.settings;
@@ -104,6 +106,7 @@ Some utilities
     * query
     * list
     * keyBuilder : function to build key to compare from items in list
+    
 ```
 #!javascript
 var utils = AlfredNode.utils;
@@ -112,7 +115,6 @@ utils.filter("a", ["a", "b", "c"], function(item){return item});
 // => return ["a"]
 utils.filter("pen", [{name: "pencil"}, {name: "pen"}, {name: "book"}], function(item){ return item.name});
 // => return [{name: "pencil"}, {name: "pen"}]
-
 ```
 
 ## Release History ##
