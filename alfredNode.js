@@ -2,6 +2,7 @@
 var Workflow = (function() {
     var _items = [];
     var _name = "AlfredWfNodeJs";
+    var handlers = {};
     return {
         setName: function(name) {
             _name = name;
@@ -31,6 +32,48 @@ var Workflow = (function() {
             var ret = ele.end();
             console.log(ret);
             return ret;
+        },
+
+        registerActionHandler: function(action, handler) {
+            handlers[action] = handler;
+        },
+    };
+})();
+
+// === Action Handler ===
+var ActionHandler = (function() {
+    var events = require('events');
+    var eventEmitter = new events.EventEmitter();
+    return {
+        onAction: function(action, handler) {
+            if (!action || !handler) {
+                return;
+            }
+            eventEmitter.on("action-" + action, handler);
+        },
+
+        onSubAction: function(action, handler) {
+            if (!action || !handler) {
+                return;
+            }
+            eventEmitter.on("subAction-" + action, handler);
+        },
+
+        handle: function(action, query) {
+            if (query.indexOf(Utils.SUB_ACTION_SEPARATOR) === -1) {
+                // handle action
+                eventEmitter.emit("action-" + action, query);
+            } else {
+                // handle sub action
+                var tmp = query.split(Utils.SUB_ACTION_SEPARATOR);
+                var selectedItem = tmp[0].trim();
+                query = tmp[1];
+                eventEmitter.emit("subAction-" + action, selectedItem, query);
+            }
+        },
+
+        clear: function() {
+            eventEmitter.removeAllListeners();
         }
     };
 })();
@@ -162,6 +205,8 @@ var Settings = (function() {
 var Utils = (function() {
     var fuzzy = require('fuzzy');
     return {
+        SUB_ACTION_SEPARATOR: ">",
+
         filter: function(query, list, keyBuilder) {
             if (!query) {
                 return list;
@@ -194,7 +239,13 @@ function _removeEmptyProperties(data) {
 module.exports = {
     storage: Storage,
     workflow: Workflow,
+    actionHandler: ActionHandler,
     settings: Settings,
     Item: Item,
-    utils: Utils
+    utils: Utils,
+    run: function() {
+        var action = process.argv[2];
+        var query = process.argv[3];
+        ActionHandler.handle(action, query);
+    }
 };

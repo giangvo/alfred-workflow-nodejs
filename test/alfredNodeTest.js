@@ -89,6 +89,85 @@ suite("#WorkflowTest", function() {
 });
 
 suite("#StorageTest", function() {
+    var actionHandler = AlfredNode.actionHandler;
+    setup(function() {
+        actionHandler.clear();
+    });
+
+
+    it("test action handler", function() {
+        var data = "";
+        actionHandler.onAction("action", function(query) {
+            data = query;
+        });
+
+        actionHandler.handle("action", "myquery");
+
+        assert.strictEqual(data, "myquery");
+
+    });
+
+    it("test action handler is not call for different action", function() {
+        var data = "";
+        actionHandler.onAction("action", function(query) {
+            data = query;
+        });
+
+        actionHandler.handle("actionX", "myquery");
+
+        assert.strictEqual(data, "");
+
+    });
+
+    it("test sub action handler", function() {
+        var data1 = "";
+        var data2 = "";
+        actionHandler.onSubAction("action", function(selectedItem, query) {
+            data1 = selectedItem;
+            data2 = query;
+        });
+
+        actionHandler.handle("action", "abc>myquery");
+        assert.strictEqual(data1, "abc");
+        assert.strictEqual(data2, "myquery");
+    });
+
+    it("test sub action handler with empty query", function() {
+        var data1 = "";
+        var data2 = "";
+        actionHandler.onSubAction("action", function(selectedItem, query) {
+            data1 = selectedItem;
+            data2 = query;
+        });
+
+        actionHandler.handle("action", "abc>");
+        assert.strictEqual(data1, "abc");
+        assert.strictEqual(data2, "");
+    });
+
+    it("test action and sub action handler", function() {
+        var data0 = "";
+        var data1 = "";
+        var data2 = "";
+
+        actionHandler.onAction("action", function(query) {
+            data0 = query;
+        });
+
+        actionHandler.onSubAction("action", function(selectedItem, query) {
+            data1 = selectedItem;
+            data2 = query;
+        });
+
+        actionHandler.handle("action", "myquery");
+        assert.strictEqual(data0, "myquery");
+
+        actionHandler.handle("action", "abc>myquery");
+        assert.strictEqual(data1, "abc");
+        assert.strictEqual(data2, "myquery");
+    });
+});
+suite("#StorageTest", function() {
     setup(function() {
         storage.clear();
     });
