@@ -1,6 +1,7 @@
 var Chai = require("chai");
 var should = Chai.should();
 var assert = Chai.assert;
+var sinon = require("sinon");
 
 var sleep = require("sleep");
 
@@ -41,7 +42,7 @@ suite("#ItemTest", function() {
 });
 
 suite("#WorkflowTest", function() {
-    setup(function() {
+    teardown(function() {
         workflow.clearItems();
     });
 
@@ -88,9 +89,9 @@ suite("#WorkflowTest", function() {
     });
 });
 
-suite("#StorageTest", function() {
+suite("#ActionHandlerTest", function() {
     var actionHandler = AlfredNode.actionHandler;
-    setup(function() {
+    teardown(function() {
         actionHandler.clear();
     });
 
@@ -167,8 +168,9 @@ suite("#StorageTest", function() {
         assert.strictEqual(data2, "myquery");
     });
 });
+
 suite("#StorageTest", function() {
-    setup(function() {
+    teardown(function() {
         storage.clear();
     });
 
@@ -252,7 +254,7 @@ suite("#StorageTest", function() {
 suite("#Settings test", function() {
     var Settings = AlfredNode.settings;
 
-    setup(function() {
+    teardown(function() {
         Settings.clear();
     });
 
@@ -317,5 +319,27 @@ suite("#Utils test", function() {
 
         results = Utils.filter("abcdef", list, keyBuilder);
         assert.strictEqual(results.length, 0);
+    });
+});
+
+suite("#RunTest", function() {
+    var actionHandler = AlfredNode.actionHandler;
+
+    teardown(function() {
+        actionHandler.clear();
+        process.argv = [];
+    });
+
+    it("test 1", function() {
+        process.argv = ["", "", "action", "myquery"];
+
+        var data = "";
+        actionHandler.onAction("action", function(query) {
+            data = query;
+        });
+
+        AlfredNode.run();
+
+        assert.strictEqual(data, "myquery");
     });
 });
