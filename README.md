@@ -22,10 +22,30 @@ npm install "alfred-workflow-nodejs"
 npm test
 ```
 ## Usage ##
-### Import AlfredNode instance ###
+### Workflow skeleton ###
+Workflow command
+```
+#!bash
+/usr/local/bin/node main.js "action" "query"
+```
+**main.js**
 ```
 #!javascript
 var AlfredNode = require('alfred-workflow-nodejs');
+var actionHandler = AlfredNode.actionHandler;
+var wf = AlfredNode.workflow;
+var Item = AlfredNode.Item;
+
+(function main() {
+    actionHandler.onAction("action1", function(query) {
+        // your code to handle action 1 here
+    });
+    actionHandler.onAction("action2", function(query) {
+        // your code to handle action 2 here
+    });
+
+    AlfredNode.run();
+})();
 ```
 
 ### Workflow and Item - Generate feedbacks ###
@@ -125,4 +145,6 @@ utils.filter("pen", [{name: "pencil"}, {name: "pen"}, {name: "book"}], function(
 ```
 
 ## Release History ##
-* 1.0 Initial release
+* 0.0.1 Initial release
+* 0.0.2 Fix bug storage
+* 0.0.3 Add workflow skeleton
