@@ -87,6 +87,20 @@ suite("#WorkflowTest", function() {
 
         assert.strictEqual(expectedObj, ret);
     });
+
+    it("clear items", function() {
+        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items/></root>';
+        var item = new Item({
+            "title": "title"
+        });
+        workflow.addItem(item);
+        workflow.clearItems();
+
+        var ret = workflow.feedback();
+
+        assert.strictEqual(expectedObj, ret);
+
+    });
 });
 
 suite("#ActionHandlerTest", function() {
@@ -319,27 +333,5 @@ suite("#Utils test", function() {
 
         results = Utils.filter("abcdef", list, keyBuilder);
         assert.strictEqual(results.length, 0);
-    });
-});
-
-suite("#RunTest", function() {
-    var actionHandler = AlfredNode.actionHandler;
-
-    teardown(function() {
-        actionHandler.clear();
-        process.argv = [];
-    });
-
-    it("test 1", function() {
-        process.argv = ["", "", "action", "myquery"];
-
-        var data = "";
-        actionHandler.onAction("action", function(query) {
-            data = query;
-        });
-
-        AlfredNode.run();
-
-        assert.strictEqual(data, "myquery");
     });
 });
