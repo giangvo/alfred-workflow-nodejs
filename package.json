@@ -6,7 +6,7 @@
   "main": "alfredNode.js",
   "repository": {
     "type": "git",
-    "url": "git@bitbucket.org:giangvo_Atlassian/alfred-workflow-nodejs.git"
+    "url": "https://bitbucket.org/giangvo_Atlassian/alfred-workflow-nodejs"
   },
   "dependencies": {
     "fuzzy": "*",
