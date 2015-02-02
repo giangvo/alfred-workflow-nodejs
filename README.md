@@ -143,6 +143,9 @@ utils.filter("pen", [{name: "pencil"}, {name: "pen"}, {name: "book"}], function(
 // => return [{name: "pencil"}, {name: "pen"}]
 ```
 
+### Notes ###
+You can look at some tests in test folder in source code get more about usage
+
 ## Source code and document ##
 https://github.com/giangvo/alfred-workflow-nodejs
 or 
