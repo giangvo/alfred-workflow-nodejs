@@ -155,3 +155,4 @@ https://bitbucket.org/giangvo_Atlassian/alfred-workflow-nodejs
 * 0.0.1 Initial release
 * 0.0.2 Fix bug storage
 * 0.0.3 Add workflow skeleton
+* 0.0.4 Add more docs and update git repo
