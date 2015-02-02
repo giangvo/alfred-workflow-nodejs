@@ -7,12 +7,11 @@ A small library providing helpers to create Alfred Workflow
 * Storage - Helper to CRUD data
 * Settings - Helper to CRUD settings, store password securely
 * Utils 
+
 ## Installation ##
 
 ```
 #!bash
-npm install "https://bitbucket.org/giangvo_Atlassian/alfred-workflow-nodejs/get/master.tar.gz"
-or 
 npm install "alfred-workflow-nodejs"
 ```
 ## Tests ##
@@ -126,7 +125,7 @@ settings.getPassword("username", function(error, password){
 });
 ```
   
-### Utils - Helper functions###
+### Utils - Helper functions ###
 Some utilities
 
 * filter(query, list, keyBuilder) : filter list of object using fuzzy matching
@@ -143,6 +142,11 @@ utils.filter("a", ["a", "b", "c"], function(item){return item});
 utils.filter("pen", [{name: "pencil"}, {name: "pen"}, {name: "book"}], function(item){ return item.name});
 // => return [{name: "pencil"}, {name: "pen"}]
 ```
+
+## Source code and document ##
+https://github.com/giangvo/alfred-workflow-nodejs
+or 
+https://bitbucket.org/giangvo_Atlassian/alfred-workflow-nodejs
 
 ## Release History ##
 * 0.0.1 Initial release
