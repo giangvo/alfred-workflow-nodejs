@@ -204,6 +204,7 @@ var Settings = (function() {
 // === Utils
 var Utils = (function() {
     var fuzzy = require('fuzzy');
+    var applescript = require('node-osascript');
     return {
         SUB_ACTION_SEPARATOR: ">",
 
@@ -219,6 +220,32 @@ var Utils = (function() {
             return fuzzy.filter(query, list, options).map(function(item) {
                 return item.original;
             });
+        },
+
+        /**
+         * a wrapper of "applescript" module
+         * @type {Object}
+         */
+        applescript: {
+            /**
+             * execute script
+             * @param script
+             * @param handler: function(err, result)
+             */
+            execute: function(script, handler) {
+                console.log("1111111");
+                applescript.execute(script, handler);
+            },
+
+            /**
+             * execute script file
+             * @param path to script file
+             * @param variable variable
+             * @param handler: function(err, result, raw)
+             */
+            executeFile: function(path, varibale, handler) {
+                applescript.execute.apply(this, arguments);
+            }
         }
     };
 })();

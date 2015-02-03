@@ -11,6 +11,7 @@
   "dependencies": {
     "fuzzy": "*",
     "keychain": "0.0.4",
+    "node-osascript": "^1.0.2",
     "node-persist": "*",
     "request": "^2.51.0",
     "xmlbuilder": "*"
