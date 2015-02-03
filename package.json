@@ -24,5 +24,9 @@
   },
   "scripts": {
     "test": "make test"
-  }
+  },
+  "keywords": [
+    "alfred",
+    "workflow"
+  ]
 }
