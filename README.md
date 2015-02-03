@@ -1,12 +1,14 @@
 Alfred Workflow Nodejs Library
 =========
 
+## Overview ##
+
 A small library providing helpers to create Alfred Workflow
 
 * Workflow & Item - Helper to build and generate feedbacks
 * Storage - Helper to CRUD data
 * Settings - Helper to CRUD settings, store password securely
-* Utils 
+* Utils  - Helper to filter arrays, run applesripts, etc...
 
 ## Installation ##
 
@@ -81,8 +83,8 @@ workflow.feedback();
 ### Storage - APIs to CRUD data ###
 * set(key, value, [ttl])
     * key: string
-    * value: object
-    * ttl: long (milisecond)
+    * value: string/object
+    * ttl: long (milisecond) // time to live 
 * get(key)
 * remove(key)
 * clear() : clear all data, be carefull!!!
@@ -91,7 +93,7 @@ workflow.feedback();
 #!javascript
 var storage = AlfredNode.storage;
 storge.set("key", "value");
-storage.set("key", {"name":"node", 1000}; //ttl in miliseconds
+storage.set("key", {name: "node"}, 1000);
 storage.get("key");
 storage.remove("key");
 storage.clear();
