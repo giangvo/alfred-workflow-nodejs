@@ -1,7 +1,7 @@
 Alfred Workflow Nodejs Library
 =========
 
-## Overview ##
+## Overview
 
 A small library providing helpers to create Alfred Workflow
 
@@ -10,28 +10,24 @@ A small library providing helpers to create Alfred Workflow
 * Settings - Helper to CRUD settings, store password securely
 * Utils  - Helper to filter arrays, run applesripts, etc...
 
-## Installation ##
+## Installation
 
-```
-#!bash
+```shell
 npm install "alfred-workflow-nodejs"
 ```
-## Tests ##
+## Tests
 
-```
-#!bash
+```shell
 npm test
 ```
-## Usage ##
-### Workflow skeleton ###
+## Usage
+### Workflow skeleton 
 Workflow command
-```
-#!bash
+```shell
 /usr/local/bin/node main.js "action" "query"
 ```
 **main.js**
-```
-#!javascript
+```js
 var AlfredNode = require('alfred-workflow-nodejs');
 var actionHandler = AlfredNode.actionHandler;
 var wf = AlfredNode.workflow;
@@ -49,11 +45,10 @@ var Item = AlfredNode.Item;
 })();
 ```
 
-### Workflow and Item - Generate feedbacks ###
+### Workflow and Item - Generate feedbacks 
 * Workflow is used to build and generate feedbacks
 
-```
-#!javascript
+```js
 var workflow = AlfredNode.workflow;
 // set name for workflow (you SHOULD set name for your wf)
 workflow.setName("example-alfred-workflow-using-nodejs");
@@ -68,8 +63,7 @@ workflow.setName("example-alfred-workflow-using-nodejs");
     * valid(true/false, default is false)
     * autocomplete
 
-```
-#!javascript
+```js
 var Item = AlfredNode.Item;
 var item1 = new Item({title: "item 1", subtile: "sub 1"});
 var item2 = new Item({uid: "uid", title: "item 1", subtile: "sub 1", valid: true, icon: "icon.png", arg: "arg",  autocomplete: "autocomplete"});
@@ -80,7 +74,7 @@ workflow.feedback();
 
 ```
 
-### Storage - APIs to CRUD data ###
+### Storage - APIs to CRUD data 
 * set(key, value, [ttl])
     * key: string
     * value: string/object
@@ -89,8 +83,7 @@ workflow.feedback();
 * remove(key)
 * clear() : clear all data, be carefull!!!
 
-```
-#!javascript
+```js
 var storage = AlfredNode.storage;
 storge.set("key", "value");
 storage.set("key", {name: "node"}, 1000);
@@ -99,7 +92,7 @@ storage.remove("key");
 storage.clear();
 ```
     
-### Settings - APIs to CRUD settings ###
+### Settings - APIs to CRUD settings 
 Helpers to store string key/value settings, store password into Mac keychain
 
 * set(key, value, [ttl])
@@ -113,8 +106,7 @@ Helpers to store string key/value settings, store password into Mac keychain
     * username
     * callback(error, password): callback function that is called after password is returned
 
-```
-#!javascript
+```js
 var settings = AlfredNode.settings;
 settings.set("key", "stringValue");
 settings.get("key");
@@ -127,7 +119,7 @@ settings.getPassword("username", function(error, password){
 });
 ```
   
-### Utils - Helper functions ###
+### Utils - Helper functions 
 Some utilities
 
 * filter(query, list, keyBuilder) : filter list of object using fuzzy matching
@@ -135,8 +127,7 @@ Some utilities
     * list
     * keyBuilder : function to build key to compare from items in list
     
-```
-#!javascript
+```js
 var utils = AlfredNode.utils;
 // filter array of string/object using fuzzy matching
 utils.filter("a", ["a", "b", "c"], function(item){return item});
@@ -145,15 +136,15 @@ utils.filter("pen", [{name: "pencil"}, {name: "pen"}, {name: "book"}], function(
 // => return [{name: "pencil"}, {name: "pen"}]
 ```
 
-### Notes ###
+### Notes 
 You can look at some tests in test folder in source code get more about usage
 
-## Source code and document ##
+## Source code and document
 https://github.com/giangvo/alfred-workflow-nodejs
 or 
 https://bitbucket.org/giangvo_Atlassian/alfred-workflow-nodejs
 
-## Release History ##
+## Release History
 * 0.0.1 Initial release
 * 0.0.2 Fix bug storage
 * 0.0.3 Add workflow skeleton
