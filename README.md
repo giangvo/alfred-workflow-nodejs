@@ -21,6 +21,13 @@ npm install "alfred-workflow-nodejs"
 npm test
 ```
 ## Usage
+### Quick start
+* Download default workflow from here: https://github.com/giangvo/alfred-workflow-nodejs/raw/master/AlfredNodejsWorkflow.alfredworkflow
+* Import it to Alfred
+* Navigate to workflow folder and run `npm install`
+* Update module name (in package.json) and workflow name (in main.js) - Optional but recommend
+* Edit main.js to add your logic.
+
 ### Workflow skeleton 
 Workflow command
 ```shell
@@ -149,3 +156,4 @@ https://bitbucket.org/giangvo_Atlassian/alfred-workflow-nodejs
 * 0.0.2 Fix bug storage
 * 0.0.3 Add workflow skeleton
 * 0.0.4 Add more docs and update git repo
+* 0.0.5 Add default workflow
