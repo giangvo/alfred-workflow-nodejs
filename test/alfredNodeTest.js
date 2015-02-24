@@ -101,6 +101,30 @@ suite("#WorkflowTest", function() {
         assert.strictEqual(expectedObj, ret);
 
     });
+
+    it("generate error feeback", function() {
+        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf error</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertStopIcon.icns</icon></item></items></root>';
+        
+        var ret = workflow.error("wf error");
+
+        assert.strictEqual(expectedObj, ret);
+    });
+
+    it("generate warning feeback", function() {
+        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf warning</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionIcon.icns</icon></item></items></root>';
+        
+        var ret = workflow.warning("wf warning");
+
+        assert.strictEqual(expectedObj, ret);
+    });
+
+    it("generate info feeback", function() {
+        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf info</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns</icon></item></items></root>';
+        
+        var ret = workflow.info("wf info");
+
+        assert.strictEqual(expectedObj, ret);
+    });
 });
 
 suite("#ActionHandlerTest", function() {
@@ -346,5 +370,34 @@ suite("#Utils test", function() {
 
         results = Utils.filter("abcdef", list, keyBuilder);
         assert.strictEqual(results.length, 0);
+    });
+});
+
+suite("Icons tests", function() {
+    var ICONS = AlfredNode.ICONS;
+    var fs = require("fs");
+    
+    it("Check icons exist", function() {
+        assert.isTrue(fs.existsSync(ICONS.ACCOUNT));
+        assert.isTrue(fs.existsSync(ICONS.BURN));
+        assert.isTrue(fs.existsSync(ICONS.CLOCK));
+        assert.isTrue(fs.existsSync(ICONS.COLOR));
+        assert.isTrue(fs.existsSync(ICONS.EJECT));
+        assert.isTrue(fs.existsSync(ICONS.ERROR));
+        assert.isTrue(fs.existsSync(ICONS.FAVORITE));
+        assert.isTrue(fs.existsSync(ICONS.GROUP));
+        assert.isTrue(fs.existsSync(ICONS.HELP));
+        assert.isTrue(fs.existsSync(ICONS.HOME));
+        assert.isTrue(fs.existsSync(ICONS.INFO));
+        assert.isTrue(fs.existsSync(ICONS.NETWORK));
+        assert.isTrue(fs.existsSync(ICONS.NOTE));
+        assert.isTrue(fs.existsSync(ICONS.SETTINGS));
+        assert.isTrue(fs.existsSync(ICONS.SWIRL));
+        assert.isTrue(fs.existsSync(ICONS.SWITCH));
+        assert.isTrue(fs.existsSync(ICONS.SYNC));
+        assert.isTrue(fs.existsSync(ICONS.TRASH));
+        assert.isTrue(fs.existsSync(ICONS.USER));
+        assert.isTrue(fs.existsSync(ICONS.WARNING));
+        assert.isTrue(fs.existsSync(ICONS.WEB));
     });
 });

@@ -3,6 +3,28 @@ var Workflow = (function() {
     var _items = [];
     var _name = "AlfredWfNodeJs";
     var handlers = {};
+    var clearItems = function() {
+        _items = [];
+    };
+
+    var addItem = function(item) {
+        _items.push(item.feedback());
+    };
+
+    var feedback = function() {
+        var root = require('xmlbuilder').create('root', {
+            version: '1.0',
+            encoding: 'UTF-8'
+        });
+
+        var ele = root.ele({
+            items: _items
+        });
+        var ret = ele.end();
+        console.log(ret);
+        return ret;
+    };
+
     return {
         setName: function(name) {
             _name = name;
@@ -12,26 +34,43 @@ var Workflow = (function() {
             return _name;
         },
 
-        addItem: function(item) {
-            _items.push(item.feedback());
+        addItem: addItem,
+
+        clearItems: clearItems,
+
+        feedback: feedback,
+
+        info: function(title, subtitle) {
+            clearItems();
+            addItem(new Item({
+                title: title,
+                subtitle: subtitle,
+                icon: ICONS.INFO
+            }));
+
+            return feedback();
         },
 
-        clearItems: function() {
-            _items = [];
+        warning: function(title, subtitle) {
+            clearItems();
+            addItem(new Item({
+                title: title,
+                subtitle: subtitle,
+                icon: ICONS.WARNING
+            }));
+
+            return feedback();
         },
 
-        feedback: function() {
-            var root = require('xmlbuilder').create('root', {
-                version: '1.0',
-                encoding: 'UTF-8'
-            });
+        error: function(title, subtitle) {
+            clearItems();
+            addItem(new Item({
+                title: title,
+                subtitle: subtitle,
+                icon: ICONS.ERROR
+            }));
 
-            var ele = root.ele({
-                items: _items
-            });
-            var ret = ele.end();
-            console.log(ret);
-            return ret;
+            return feedback();
         },
 
         registerActionHandler: function(action, handler) {
@@ -250,6 +289,35 @@ var Utils = (function() {
     };
 })();
 
+var ICONS = (function() {
+    // mac icons root folder
+    var ICON_ROOT = "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/";
+
+    return {
+        ACCOUNT: ICON_ROOT + "Accounts.icns",
+        BURN: ICON_ROOT + "BurningIcon.icns",
+        CLOCK: ICON_ROOT + "Clock.icns",
+        COLOR: ICON_ROOT + "ProfileBackgroundColor.icns",
+        EJECT: ICON_ROOT + "EjectMediaIcon.icns",
+        ERROR: ICON_ROOT + "AlertStopIcon.icns",
+        FAVORITE: ICON_ROOT + "ToolbarFavoritesIcon.icns",
+        GROUP: ICON_ROOT + "GroupIcon.icns",
+        HELP: ICON_ROOT + "HelpIcon.icns",
+        HOME: ICON_ROOT + "HomeFolderIcon.icns",
+        INFO: ICON_ROOT + "ToolbarInfo.icns",
+        NETWORK: ICON_ROOT + "GenericNetworkIcon.icns",
+        NOTE: ICON_ROOT + "AlertNoteIcon.icns",
+        SETTINGS: ICON_ROOT + "ToolbarAdvanced.icns",
+        SWIRL: ICON_ROOT + "ErasingIcon.icns",
+        SWITCH: ICON_ROOT + "General.icns",
+        SYNC: ICON_ROOT + "Sync.icns",
+        TRASH: ICON_ROOT + "TrashIcon.icns",
+        USER: ICON_ROOT + "UserIcon.icns",
+        WARNING: ICON_ROOT + "AlertCautionIcon.icns",
+        WEB: ICON_ROOT + "BookmarkIcon.icns",
+    };
+})();
+
 // === private functions
 function _removeEmptyProperties(data) {
     for (var key in data) {
@@ -270,6 +338,7 @@ module.exports = {
     settings: Settings,
     Item: Item,
     utils: Utils,
+    ICONS: ICONS,
     run: function() {
         var action = process.argv[2];
         var query = process.argv[3];
