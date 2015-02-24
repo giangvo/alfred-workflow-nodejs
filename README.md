@@ -30,7 +30,7 @@ Workflow command
 ```js
 var AlfredNode = require('alfred-workflow-nodejs');
 var actionHandler = AlfredNode.actionHandler;
-var wf = AlfredNode.workflow;
+var workflow = AlfredNode.workflow;
 var Item = AlfredNode.Item;
 
 (function main() {
@@ -65,8 +65,8 @@ workflow.setName("example-alfred-workflow-using-nodejs");
 
 ```js
 var Item = AlfredNode.Item;
-var item1 = new Item({title: "item 1", subtile: "sub 1"});
-var item2 = new Item({uid: "uid", title: "item 1", subtile: "sub 1", valid: true, icon: "icon.png", arg: "arg",  autocomplete: "autocomplete"});
+var item1 = new Item({title: "item 1", subtitle: "sub 1"});
+var item2 = new Item({uid: "uid", title: "item 1", subtitle: "sub 1", valid: true, icon: "icon.png", arg: "arg",  autocomplete: "autocomplete"});
 workflow.addItem(item1);
 workflow.addItem(item2);
 // generate feedbacks

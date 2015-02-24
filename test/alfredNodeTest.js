@@ -122,6 +122,19 @@ suite("#ActionHandlerTest", function() {
 
     });
 
+    it("test action handler for empty query", function() {
+        var data = "";
+        actionHandler.onAction("action", function(query) {
+            data = query;
+        });
+
+        actionHandler.handle("action", undefined);
+
+        assert.strictEqual(data, undefined);
+
+    });
+
+
     it("test action handler is not call for different action", function() {
         var data = "";
         actionHandler.onAction("action", function(query) {

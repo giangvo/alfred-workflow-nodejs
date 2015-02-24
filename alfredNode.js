@@ -60,7 +60,7 @@ var ActionHandler = (function() {
         },
 
         handle: function(action, query) {
-            if (query.indexOf(Utils.SUB_ACTION_SEPARATOR) === -1) {
+            if (!query || query.indexOf(Utils.SUB_ACTION_SEPARATOR) === -1) {
                 // handle action
                 eventEmitter.emit("action-" + action, query);
             } else {
