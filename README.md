@@ -81,6 +81,14 @@ workflow.feedback();
 
 ```
 
+* Generate info/warning/error message
+```js
+workflow.info("title", "subtitle");
+workflow.warning("title", "subtitle");
+workflow.error("title", "subtitle");
+
+```
+
 ### Storage - APIs to CRUD data 
 * set(key, value, [ttl])
     * key: string
@@ -143,6 +151,13 @@ utils.filter("pen", [{name: "pencil"}, {name: "pen"}, {name: "book"}], function(
 // => return [{name: "pencil"}, {name: "pen"}]
 ```
 
+### Icons - Some built-in icons
+Icons are from "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources"
+e.g
+AlfredNode.ICONS.ERROR
+AlfredNode.ICONS.INFO
+(ACCOUNT, BURN, CLOCK, COLOR, EJECT, ERROR, FAVORITE, GROUP, HELP, HOME, INFO, NETWORK, NOTE, SETTINGS, SWIRL, SWITCH, SYNC, TRASH, USER, WARNING, WEB)
+
 ### Notes 
 You can look at some tests in test folder in source code get more about usage
 
@@ -158,3 +173,4 @@ https://bitbucket.org/giangvo_Atlassian/alfred-workflow-nodejs
 * 0.0.4 Add more docs and update git repo
 * 0.0.5 Add default workflow
 * 1.0.0 Stable release
+* 1.0.1 Add info/warning/error message for workflow. Add some built-in icons.
