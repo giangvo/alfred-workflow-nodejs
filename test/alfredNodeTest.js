@@ -110,6 +110,19 @@ suite("#WorkflowTest", function() {
         assert.strictEqual(expectedObj, ret);
     });
 
+    it("generate error feeback with 1 added item", function() {
+        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf error</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertStopIcon.icns</icon></item></items></root>';
+        
+        var item = new Item({
+            "title": "title"
+        });
+        workflow.addItem(item);
+
+        var ret = workflow.error("wf error");
+
+        assert.strictEqual(expectedObj, ret);
+    });
+
     it("generate warning feeback", function() {
         var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf warning</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionIcon.icns</icon></item></items></root>';
         
@@ -118,8 +131,34 @@ suite("#WorkflowTest", function() {
         assert.strictEqual(expectedObj, ret);
     });
 
+    it("generate warning feeback with 1 added item", function() {
+        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf warning</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionIcon.icns</icon></item></items></root>';
+        
+        var item = new Item({
+            "title": "title"
+        });
+        workflow.addItem(item);
+
+        var ret = workflow.warning("wf warning");
+
+        assert.strictEqual(expectedObj, ret);
+    });
+
     it("generate info feeback", function() {
         var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf info</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns</icon></item></items></root>';
+        
+        var ret = workflow.info("wf info");
+
+        assert.strictEqual(expectedObj, ret);
+    })
+
+    it("generate info feeback with 1 added item", function() {
+        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf info</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns</icon></item></items></root>';
+        
+        var item = new Item({
+            "title": "title"
+        });
+        workflow.addItem(item);
         
         var ret = workflow.info("wf info");
 
