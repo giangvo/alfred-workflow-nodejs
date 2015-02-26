@@ -272,7 +272,6 @@ var Utils = (function() {
              * @param handler: function(err, result)
              */
             execute: function(script, handler) {
-                console.log("1111111");
                 applescript.execute(script, handler);
             },
 
