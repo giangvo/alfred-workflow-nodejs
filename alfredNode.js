@@ -282,7 +282,7 @@ var Utils = (function() {
              * @param handler: function(err, result, raw)
              */
             executeFile: function(path, varibale, handler) {
-                applescript.execute.apply(this, arguments);
+                applescript.executeFile.apply(this, arguments);
             }
         }
     };
