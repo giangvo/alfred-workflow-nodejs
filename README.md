@@ -153,9 +153,12 @@ utils.filter("pen", [{name: "pencil"}, {name: "pen"}, {name: "book"}], function(
 
 ### Icons - Some built-in icons
 Icons are from "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources"
-e.g
+
+```js
 AlfredNode.ICONS.ERROR
 AlfredNode.ICONS.INFO
+
+```
 (ACCOUNT, BURN, CLOCK, COLOR, EJECT, ERROR, FAVORITE, GROUP, HELP, HOME, INFO, NETWORK, NOTE, SETTINGS, SWIRL, SWITCH, SYNC, TRASH, USER, WARNING, WEB)
 
 ### Notes 
