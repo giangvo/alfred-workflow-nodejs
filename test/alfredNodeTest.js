@@ -9,6 +9,7 @@ var AlfredNode = require("../alfredNode.js");
 var workflow = AlfredNode.workflow;
 var storage = AlfredNode.storage;
 var Item = AlfredNode.Item;
+var Utils = AlfredNode.utils;
 
 suite("#ItemTest", function() {
     it("test item 1", function() {
@@ -213,12 +214,12 @@ suite("#ActionHandlerTest", function() {
     it("test sub action handler", function() {
         var data1 = "";
         var data2 = "";
-        actionHandler.onSubAction("action", function(selectedItem, query) {
+        actionHandler.onMenuItemSelected("action", function(selectedItem, query) {
             data1 = selectedItem;
             data2 = query;
         });
 
-        actionHandler.handle("action", "abc>myquery");
+        actionHandler.handle("action", "abc" + Utils.SUB_ACTION_SEPARATOR + "myquery");
         assert.strictEqual(data1, "abc");
         assert.strictEqual(data2, "myquery");
     });
@@ -226,12 +227,12 @@ suite("#ActionHandlerTest", function() {
     it("test sub action handler with empty query", function() {
         var data1 = "";
         var data2 = "";
-        actionHandler.onSubAction("action", function(selectedItem, query) {
+        actionHandler.onMenuItemSelected("action", function(selectedItem, query) {
             data1 = selectedItem;
             data2 = query;
         });
 
-        actionHandler.handle("action", "abc>");
+        actionHandler.handle("action", "abc" + Utils.SUB_ACTION_SEPARATOR);
         assert.strictEqual(data1, "abc");
         assert.strictEqual(data2, "");
     });
@@ -245,7 +246,7 @@ suite("#ActionHandlerTest", function() {
             data0 = query;
         });
 
-        actionHandler.onSubAction("action", function(selectedItem, query) {
+        actionHandler.onMenuItemSelected("action", function(selectedItem, query) {
             data1 = selectedItem;
             data2 = query;
         });
@@ -253,7 +254,7 @@ suite("#ActionHandlerTest", function() {
         actionHandler.handle("action", "myquery");
         assert.strictEqual(data0, "myquery");
 
-        actionHandler.handle("action", "abc>myquery");
+        actionHandler.handle("action", "abc" + Utils.SUB_ACTION_SEPARATOR + "myquery");
         assert.strictEqual(data1, "abc");
         assert.strictEqual(data2, "myquery");
     });
@@ -385,7 +386,6 @@ suite("#Settings test", function() {
 });
 
 suite("#Utils test", function() {
-    var Utils = AlfredNode.utils;
     it("test filter 1", function() {
         var list = [{
             key: "1",

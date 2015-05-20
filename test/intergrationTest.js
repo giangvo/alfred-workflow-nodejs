@@ -50,6 +50,17 @@ suite("#Integration test", function() {
             actionHandler.onAction("action", function(query) {
                 feedback = search(query);
             });
+
+            actionHandler.onMenuItemSelected("action", function(selectedItem, query) {
+                console.log("onMenuItemSelected.....");
+                wf.addItem(new Item({
+                    title: "Menu Item 1: " + query,
+                    subtitle: selectedItem
+                }));
+
+                feedback = wf.feedback();
+            });
+
             wf.clearItems();
 
             AlfredNode.run();
@@ -63,6 +74,12 @@ suite("#Integration test", function() {
             process.argv = ["", "", "action", ""];
             AlfredNode.run();
             assert.strictEqual('<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>Alex</title><subtitle>20</subtitle></item><item valid="NO"><title>David</title><subtitle>30</subtitle></item><item valid="NO"><title>Kat</title><subtitle>10</subtitle></item></items></root>', feedback);
+            wf.clearItems();
+
+            // test menuitem
+            process.argv = ["", "", "action", "Alex" + AlfredNode.utils.SUB_ACTION_SEPARATOR + "abc"];
+            AlfredNode.run();
+            assert.strictEqual('<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>Menu Item 1: abc</title><subtitle>Alex</subtitle></item></items></root>', feedback);
             wf.clearItems();
         })();
     });

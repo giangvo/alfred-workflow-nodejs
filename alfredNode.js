@@ -91,11 +91,11 @@ var ActionHandler = (function() {
             eventEmitter.on("action-" + action, handler);
         },
 
-        onSubAction: function(action, handler) {
+        onMenuItemSelected: function(action, handler) {
             if (!action || !handler) {
                 return;
             }
-            eventEmitter.on("subAction-" + action, handler);
+            eventEmitter.on("menuItemSelected-" + action, handler);
         },
 
         handle: function(action, query) {
@@ -106,8 +106,8 @@ var ActionHandler = (function() {
                 // handle sub action
                 var tmp = query.split(Utils.SUB_ACTION_SEPARATOR);
                 var selectedItem = tmp[0].trim();
-                query = tmp[1];
-                eventEmitter.emit("subAction-" + action, selectedItem, query);
+                query = tmp[1].trim();
+                eventEmitter.emit("menuItemSelected-" + action, selectedItem, query);
             }
         },
 
@@ -245,7 +245,7 @@ var Utils = (function() {
     var fuzzy = require('fuzzy');
     var applescript = require('node-osascript');
     return {
-        SUB_ACTION_SEPARATOR: ">",
+        SUB_ACTION_SEPARATOR: " $>",
 
         filter: function(query, list, keyBuilder) {
             if (!query) {
