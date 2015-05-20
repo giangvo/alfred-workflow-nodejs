@@ -166,8 +166,6 @@ You can look at some tests in test folder in source code get more about usage
 
 ## Source code and document
 https://github.com/giangvo/alfred-workflow-nodejs
-or 
-https://bitbucket.org/giangvo_Atlassian/alfred-workflow-nodejs
 
 ## Release History
 * 0.0.1 Initial release

@@ -71,11 +71,7 @@ var Workflow = (function() {
             }));
 
             return feedback();
-        },
-
-        registerActionHandler: function(action, handler) {
-            handlers[action] = handler;
-        },
+        }
     };
 })();
 
