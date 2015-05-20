@@ -5,10 +5,18 @@ var Workflow = (function() {
     var handlers = {};
     var clearItems = function() {
         _items = [];
+        Storage.remove("wfData");
     };
 
     var addItem = function(item) {
         _items.push(item.feedback());
+
+        if(item.data) {
+            var wfData = Storage.get("wfData");
+            wfData = wfData || {};
+            wfData[item.title] = item.data;
+            Storage.set("wfData", wfData);
+        }
     };
 
     var feedback = function() {
