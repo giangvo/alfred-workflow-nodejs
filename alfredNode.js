@@ -9,14 +9,18 @@ var Workflow = (function() {
     };
 
     var addItem = function(item) {
-        _items.push(item.feedback());
-
         if(item.data) {
             var wfData = Storage.get("wfData");
             wfData = wfData || {};
             wfData[item.title] = item.data;
             Storage.set("wfData", wfData);
         }
+
+        if(item.hasSubItems) {
+            item.autocomplete = item.title + Utils.SUB_ACTION_SEPARATOR;
+        }
+
+        _items.push(item.feedback());
     };
 
     var feedback = function() {

@@ -86,6 +86,22 @@ suite("#WorkflowTest", function() {
 
     });
 
+    test("generate feeback which has sub items", function() {
+        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO" autocomplete="item has subItems $>"><title>item has subItems</title></item></items></root>';
+        var item = new Item({
+            "title": "item has subItems",
+            "hasSubItems": true
+        });
+
+        workflow.addItem(item);
+
+        var ret = workflow.feedback();
+
+        assert.strictEqual(ret, expectedObj);
+
+        assert.isUndefined(storage.get("wfData"), "should not have wf data");
+    });
+
     test("generate 2 feeback", function() {
         var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item uid="1" valid="YES"><title>title 1.1</title></item><item uid="2" valid="NO"><title>title 1.2</title></item></items></root>';
         var item = new Item({
