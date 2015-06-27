@@ -5,16 +5,9 @@ var Workflow = (function() {
     var handlers = {};
     var clearItems = function() {
         _items = [];
-        clearItemsData();
     };
 
     var addItem = function(item) {
-        saveItemData(item);
-
-        if (item.hasSubItems) {
-            item.autocomplete = item.title + Utils.SUB_ACTION_SEPARATOR;
-        }
-
         _items.push(item.feedback());
     };
 
@@ -78,7 +71,11 @@ var Workflow = (function() {
             }));
 
             return feedback();
-        }
+        },
+
+        registerActionHandler: function(action, handler) {
+            handlers[action] = handler;
+        },
     };
 })();
 
@@ -94,11 +91,11 @@ var ActionHandler = (function() {
             eventEmitter.on("action-" + action, handler);
         },
 
-        onMenuItemSelected: function(action, handler) {
+        onSubAction: function(action, handler) {
             if (!action || !handler) {
                 return;
             }
-            eventEmitter.on("menuItemSelected-" + action, handler);
+            eventEmitter.on("subAction-" + action, handler);
         },
 
         handle: function(action, query) {
@@ -108,10 +105,9 @@ var ActionHandler = (function() {
             } else {
                 // handle sub action
                 var tmp = query.split(Utils.SUB_ACTION_SEPARATOR);
-                var selectedItemTitle = tmp[0].trim();
-                query = tmp[1].trim();
-
-                eventEmitter.emit("menuItemSelected-" + action, query, selectedItemTitle, getItemData(selectedItemTitle));
+                var selectedItem = tmp[0].trim();
+                query = tmp[1];
+                eventEmitter.emit("subAction-" + action, selectedItem, query);
             }
         },
 
@@ -249,7 +245,7 @@ var Utils = (function() {
     var fuzzy = require('fuzzy');
     var applescript = require('node-osascript');
     return {
-        SUB_ACTION_SEPARATOR: " $>",
+        SUB_ACTION_SEPARATOR: ">",
 
         filter: function(query, list, keyBuilder) {
             if (!query) {
@@ -331,25 +327,6 @@ function _removeEmptyProperties(data) {
     }
 
     return data;
-}
-
-// save item data into storage as "item title" => item data
-function saveItemData(item) {
-    if (item.data) {
-        var wfData = Storage.get("wfData");
-        wfData = wfData || {};
-        wfData[item.title] = item.data;
-        Storage.set("wfData", wfData);
-    }
-}
-
-function clearItemsData(item) {
-    Storage.remove("wfData");
-}
-
-function getItemData(itemTitle) {
-    var wfData = Storage.get("wfData");
-    return wfData ? wfData[itemTitle] : undefined;
 }
 
 // module export
