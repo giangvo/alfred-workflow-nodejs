@@ -9,9 +9,10 @@ var AlfredNode = require("../alfredNode.js");
 var workflow = AlfredNode.workflow;
 var storage = AlfredNode.storage;
 var Item = AlfredNode.Item;
+var Utils = AlfredNode.utils;
 
 suite("#ItemTest", function() {
-    it("test item 1", function() {
+    test("test item 1", function() {
         var item = new Item({
             "title": "title"
         });
@@ -25,7 +26,7 @@ suite("#ItemTest", function() {
         assert.deepEqual(item.feedback(), expectedObj);
     });
 
-    it("test item 2", function() {
+    test("test item 2", function() {
         var item = new Item({
             "title": "title",
             "valid": true
@@ -46,16 +47,15 @@ suite("#WorkflowTest", function() {
         workflow.clearItems();
     });
 
-    it("generate empty feeback", function() {
+    test("generate empty feeback", function() {
         var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items/></root>';
 
         var ret = workflow.feedback();
 
-        assert.strictEqual(expectedObj, ret);
-
+        assert.strictEqual(ret, expectedObj);
     });
 
-    it("generate 1 feeback", function() {
+    test("generate 1 feeback", function() {
         var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>title</title></item></items></root>';
         var item = new Item({
             "title": "title"
@@ -64,31 +64,69 @@ suite("#WorkflowTest", function() {
 
         var ret = workflow.feedback();
 
-        assert.strictEqual(expectedObj, ret);
+        assert.strictEqual(ret, expectedObj);
+
+        assert.isUndefined(storage.get("wfData"), "should not have wf data");
+    });
+
+    test("generate feeback with data", function() {
+        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>title a</title></item></items></root>';
+        var item = new Item({
+            "title": "title a",
+            "data": {count: 1}
+        });
+        workflow.addItem(item);
+
+        var ret = workflow.feedback();
+
+        assert.strictEqual(ret, expectedObj);
+
+        var wfData = storage.get("wfData");
+        assert.strictEqual(wfData["title a"].count, 1);        
 
     });
 
-    it("generate 2 feeback", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>title</title></item><item uid="1" valid="YES"><title>title 1</title></item><item uid="2" valid="NO"><title>title 2</title></item></items></root>';
+    test("generate feeback which has sub items", function() {
+        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO" autocomplete="item has subItems' + Utils.SUB_ACTION_SEPARATOR + '"><title>item has subItems</title></item></items></root>';
         var item = new Item({
-            "title": "title 1",
+            "title": "item has subItems",
+            "hasSubItems": true
+        });
+
+        workflow.addItem(item);
+
+        var ret = workflow.feedback();
+
+        assert.strictEqual(ret, expectedObj);
+
+        assert.isUndefined(storage.get("wfData"), "should not have wf data");
+    });
+
+    test("generate 2 feeback", function() {
+        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item uid="1" valid="YES"><title>title 1.1</title></item><item uid="2" valid="NO"><title>title 1.2</title></item></items></root>';
+        var item = new Item({
+            "title": "title 1.1",
             "valid": true,
             "uid": "1"
         });
         var item2 = new Item({
-            "title": "title 2",
+            "title": "title 1.2",
             "valid": false,
-            "uid": "2"
+            "uid": "2",
+            "data": {count: 1}
         });
         workflow.addItem(item);
         workflow.addItem(item2);
 
         var ret = workflow.feedback();
 
-        assert.strictEqual(expectedObj, ret);
+        assert.strictEqual(ret, expectedObj);
+
+        var wfData = storage.get("wfData");
+        assert.strictEqual(wfData["title 1.2"].count, 1);        
     });
 
-    it("clear items", function() {
+    test("clear items", function() {
         var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items/></root>';
         var item = new Item({
             "title": "title"
@@ -98,19 +136,20 @@ suite("#WorkflowTest", function() {
 
         var ret = workflow.feedback();
 
-        assert.strictEqual(expectedObj, ret);
+        assert.strictEqual(ret, expectedObj);
 
+        assert.isUndefined(storage.get("wfData"), "should not have wf data");
     });
 
-    it("generate error feeback", function() {
+    test("generate error feeback", function() {
         var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf error</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertStopIcon.icns</icon></item></items></root>';
         
         var ret = workflow.error("wf error");
 
-        assert.strictEqual(expectedObj, ret);
+        assert.strictEqual(ret, expectedObj);
     });
 
-    it("generate error feeback with 1 added item", function() {
+    test("generate error feeback with 1 added item", function() {
         var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf error</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertStopIcon.icns</icon></item></items></root>';
         
         var item = new Item({
@@ -120,18 +159,18 @@ suite("#WorkflowTest", function() {
 
         var ret = workflow.error("wf error");
 
-        assert.strictEqual(expectedObj, ret);
+        assert.strictEqual(ret, expectedObj);
     });
 
-    it("generate warning feeback", function() {
+    test("generate warning feeback", function() {
         var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf warning</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionIcon.icns</icon></item></items></root>';
         
         var ret = workflow.warning("wf warning");
 
-        assert.strictEqual(expectedObj, ret);
+        assert.strictEqual(ret, expectedObj);
     });
 
-    it("generate warning feeback with 1 added item", function() {
+    test("generate warning feeback with 1 added item", function() {
         var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf warning</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionIcon.icns</icon></item></items></root>';
         
         var item = new Item({
@@ -141,18 +180,18 @@ suite("#WorkflowTest", function() {
 
         var ret = workflow.warning("wf warning");
 
-        assert.strictEqual(expectedObj, ret);
+        assert.strictEqual(ret, expectedObj);
     });
 
-    it("generate info feeback", function() {
+    test("generate info feeback", function() {
         var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf info</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns</icon></item></items></root>';
         
         var ret = workflow.info("wf info");
 
-        assert.strictEqual(expectedObj, ret);
+        assert.strictEqual(ret, expectedObj);
     })
 
-    it("generate info feeback with 1 added item", function() {
+    test("generate info feeback with 1 added item", function() {
         var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf info</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns</icon></item></items></root>';
         
         var item = new Item({
@@ -162,7 +201,7 @@ suite("#WorkflowTest", function() {
         
         var ret = workflow.info("wf info");
 
-        assert.strictEqual(expectedObj, ret);
+        assert.strictEqual(ret, expectedObj);
     });
 });
 
@@ -173,7 +212,7 @@ suite("#ActionHandlerTest", function() {
     });
 
 
-    it("test action handler", function() {
+    test("test action handler", function() {
         var data = "";
         actionHandler.onAction("action", function(query) {
             data = query;
@@ -185,7 +224,7 @@ suite("#ActionHandlerTest", function() {
 
     });
 
-    it("test action handler for empty query", function() {
+    test("test action handler for empty query", function() {
         var data = "";
         actionHandler.onAction("action", function(query) {
             data = query;
@@ -198,7 +237,7 @@ suite("#ActionHandlerTest", function() {
     });
 
 
-    it("test action handler is not call for different action", function() {
+    test("test action handler is not call for different action", function() {
         var data = "";
         actionHandler.onAction("action", function(query) {
             data = query;
@@ -210,33 +249,35 @@ suite("#ActionHandlerTest", function() {
 
     });
 
-    it("test sub action handler", function() {
+    test("test sub action handler", function() {
         var data1 = "";
         var data2 = "";
-        actionHandler.onSubAction("action", function(selectedItem, query) {
-            data1 = selectedItem;
+        actionHandler.onMenuItemSelected("action", function(query, selectedItemTitle, selectedItemData) {
+            data1 = selectedItemTitle;
             data2 = query;
+            data3 = selectedItemData;
         });
 
-        actionHandler.handle("action", "abc>myquery");
+        actionHandler.handle("action", "abc" + Utils.SUB_ACTION_SEPARATOR + "myquery");
         assert.strictEqual(data1, "abc");
         assert.strictEqual(data2, "myquery");
+        assert.isUndefined(data3);
     });
 
-    it("test sub action handler with empty query", function() {
+    test("test sub action handler with empty query", function() {
         var data1 = "";
         var data2 = "";
-        actionHandler.onSubAction("action", function(selectedItem, query) {
+        actionHandler.onMenuItemSelected("action", function(query, selectedItem, selectedItemData) {
             data1 = selectedItem;
             data2 = query;
         });
 
-        actionHandler.handle("action", "abc>");
+        actionHandler.handle("action", "abc" + Utils.SUB_ACTION_SEPARATOR);
         assert.strictEqual(data1, "abc");
         assert.strictEqual(data2, "");
     });
 
-    it("test action and sub action handler", function() {
+    test("test action and sub action handler", function() {
         var data0 = "";
         var data1 = "";
         var data2 = "";
@@ -245,7 +286,7 @@ suite("#ActionHandlerTest", function() {
             data0 = query;
         });
 
-        actionHandler.onSubAction("action", function(selectedItem, query) {
+        actionHandler.onMenuItemSelected("action", function(query, selectedItem) {
             data1 = selectedItem;
             data2 = query;
         });
@@ -253,7 +294,7 @@ suite("#ActionHandlerTest", function() {
         actionHandler.handle("action", "myquery");
         assert.strictEqual(data0, "myquery");
 
-        actionHandler.handle("action", "abc>myquery");
+        actionHandler.handle("action", "abc" + Utils.SUB_ACTION_SEPARATOR + "myquery");
         assert.strictEqual(data1, "abc");
         assert.strictEqual(data2, "myquery");
     });
@@ -264,7 +305,7 @@ suite("#StorageTest", function() {
         storage.clear();
     });
 
-    it("test set and get item without ttl", function() {
+    test("test set and get item without ttl", function() {
         var obj = {
             text: "abc"
         };
@@ -274,7 +315,7 @@ suite("#StorageTest", function() {
         obj.should.equal(obj2);
     });
 
-    it("test set and get item with ttl is not expired", function() {
+    test("test set and get item with ttl is not expired", function() {
         var obj = {
             text: "abc"
         };
@@ -287,7 +328,7 @@ suite("#StorageTest", function() {
 
     });
 
-    it("test set and get item with ttl is expired", function() {
+    test("test set and get item with ttl is expired", function() {
         var obj = {
             text: "abc"
         };
@@ -299,7 +340,7 @@ suite("#StorageTest", function() {
         should.not.exist(obj2);
     });
 
-    it("test set and get multiple items", function() {
+    test("test set and get multiple items", function() {
         var obj1 = {
             text: "abc"
         };
@@ -315,7 +356,7 @@ suite("#StorageTest", function() {
         obj2.should.equal(storage.get("key2"));
     });
 
-    it("test remove item", function() {
+    test("test remove item", function() {
         var obj = {
             text: "abc"
         };
@@ -327,7 +368,7 @@ suite("#StorageTest", function() {
         should.not.exist(obj2);
     });
 
-    it("test clear item", function() {
+    test("test clear item", function() {
         var obj = {
             text: "abc"
         };
@@ -348,14 +389,14 @@ suite("#Settings test", function() {
         Settings.clear();
     });
 
-    it("test set + get setting", function() {
+    test("test set + get setting", function() {
         Settings.set("username", "user1");
 
         var username = Settings.get("username");
         assert.strictEqual(username, "user1");
     });
 
-    it("test set + get multiple settings", function() {
+    test("test set + get multiple settings", function() {
         Settings.set("username", "user1");
         Settings.set("password", "pass1");
 
@@ -363,19 +404,19 @@ suite("#Settings test", function() {
         assert.strictEqual("pass1", Settings.get("password"));
     });
 
-    it("test remove setting", function() {
+    test("test remove setting", function() {
         Settings.set("username", "user1");
         Settings.remove("username");
         assert.isUndefined(Settings.get("username"));
     });
 
-    it("test clear setting", function() {
+    test("test clear setting", function() {
         Settings.set("username", "user1");
         Settings.clear();
         assert.isUndefined(Settings.get("username"));
     });
 
-    it("test set password", function(done) {
+    test("test set password", function(done) {
         Settings.setPassword("user1", "mypass");
         Settings.getPassword("user1", function(error, password) {
             assert.strictEqual(password, "mypass");
@@ -385,8 +426,7 @@ suite("#Settings test", function() {
 });
 
 suite("#Utils test", function() {
-    var Utils = AlfredNode.utils;
-    it("test filter 1", function() {
+    test("test filter 1", function() {
         var list = [{
             key: "1",
             name: "This is a pencil"
@@ -416,7 +456,7 @@ suite("Icons tests", function() {
     var ICONS = AlfredNode.ICONS;
     var fs = require("fs");
     
-    it("Check icons exist", function() {
+    test("Check icons exist", function() {
         assert.isTrue(fs.existsSync(ICONS.ACCOUNT));
         assert.isTrue(fs.existsSync(ICONS.BURN));
         assert.isTrue(fs.existsSync(ICONS.CLOCK));

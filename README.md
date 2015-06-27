@@ -47,6 +47,10 @@ var Item = AlfredNode.Item;
     actionHandler.onAction("action2", function(query) {
         // your code to handle action 2 here
     });
+    
+    actionHandler.onMenuItemSelected("action2", function(query, selectedTitle, selectedData) {
+        // your code to handle manu item selected of action 2 here
+    });
 
     AlfredNode.run();
 })();
@@ -88,6 +92,88 @@ workflow.warning("title", "subtitle");
 workflow.error("title", "subtitle");
 
 ```
+
+### Menu System
+- Get sub items by using `TAB` key when select a feeback
+- Set `hasSubItems` to true when create feeback item - require
+- Set data of item to use later to build sub items by using `data` - optional
+- Implement handler for menu item selected
+```js
+/**
+* query: the query
+* selectedItemTitle: title of selected item
+* selectedItemData: data of selected item
+**/
+actionHandler.onMenuItemSelected("action", function(query, selectedItemTitle, selectedItemData){...})
+```
+
+--Scenario:
+Open Alfred and type "menu" => 2 feedbacks are generated: "Feedback A" and "Feeback B" 
+=> use arrow key to navigate to "Feedback B" and press `TAB`
+=> Alfred search bar will now become "Feedback A $>" and display menu items of "Feedback A": "Item 1 of Feedback A" and "Item 2 of Feedback A"
+
+--Code to handle "menuExample" action to generate feedback A and B
+```js
+actionHandler.onAction("menuExample", function(query) {
+    var Item = AlfredNode.Item;
+    // generate feeback A
+    var item1 = new Item({
+        title: "Feedback A",
+        subtitle: "Press tab to get menu items",
+        arg: "Feedback A",
+        hasSubItems: true, // set this to true to tell that this feedback has sub Items
+        valid: true,
+        data: {alias: "X"} // we can set data to item to use later to build sub items
+    });
+    workflow.addItem(item1);
+
+    // generate feeback B
+    var item2 = new Item({
+        title: "Feedback B",
+        subtitle: "Press tab to get menu items",
+        arg: "Feedback B",
+        hasSubItems: true, // set this to true to tell that this feedback has sub Items
+        valid: true,
+        data: {alias: "Y"} // we can set data to item to use later to build sub items
+    });
+    workflow.addItem(item2);
+
+    // generate feedbacks
+    workflow.feedback();
+});
+```
+
+--Code to handle selection of "Feeback" by using `TAB`
+```js
+/**
+* query: the query
+* title: selected title
+* data: data of selected item
+**/
+actionHandler.onMenuItemSelected("menuExample", function(query, title, data) {
+    var Item = AlfredNode.Item;
+    var item1 = new Item({
+        title: "Item 1 of " + title,
+        arg: "item 1 of " + title + " which has alias " + data.alias,
+        subtitle: data.alias, // we can get data of selected item
+        valid: true
+    });
+
+    var item2 = new Item({
+        title: "Item 2 of " + title,
+        arg: "item 2 of " + title + " which has alias " + data.alias,
+        subtitle: data.alias,
+        valid: true
+    });
+
+    workflow.addItem(item1);
+    workflow.addItem(item2);
+    // generate feedbacks
+    workflow.feedback();
+});
+```
+
+Download example workflow and test with keyword `menuexample` for more info
 
 ### Storage - APIs to CRUD data 
 * set(key, value, [ttl])
@@ -166,8 +252,6 @@ You can look at some tests in test folder in source code get more about usage
 
 ## Source code and document
 https://github.com/giangvo/alfred-workflow-nodejs
-or 
-https://bitbucket.org/giangvo_Atlassian/alfred-workflow-nodejs
 
 ## Release History
 * 0.0.1 Initial release
@@ -178,3 +262,4 @@ https://bitbucket.org/giangvo_Atlassian/alfred-workflow-nodejs
 * 1.0.0 Stable release
 * 1.0.1 Add info/warning/error message for workflow. Add some built-in icons.
 * 1.0.2 Bugs fix
+* 1.1.0 Add menu system
