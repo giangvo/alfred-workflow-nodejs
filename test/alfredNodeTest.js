@@ -87,7 +87,7 @@ suite("#WorkflowTest", function() {
     });
 
     test("generate feeback which has sub items", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO" autocomplete="item has subItems $>"><title>item has subItems</title></item></items></root>';
+        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO" autocomplete="item has subItems' + Utils.SUB_ACTION_SEPARATOR + '"><title>item has subItems</title></item></items></root>';
         var item = new Item({
             "title": "item has subItems",
             "hasSubItems": true
@@ -252,20 +252,22 @@ suite("#ActionHandlerTest", function() {
     test("test sub action handler", function() {
         var data1 = "";
         var data2 = "";
-        actionHandler.onMenuItemSelected("action", function(selectedItem, query) {
-            data1 = selectedItem;
+        actionHandler.onMenuItemSelected("action", function(query, selectedItemTitle, selectedItemData) {
+            data1 = selectedItemTitle;
             data2 = query;
+            data3 = selectedItemData;
         });
 
         actionHandler.handle("action", "abc" + Utils.SUB_ACTION_SEPARATOR + "myquery");
         assert.strictEqual(data1, "abc");
         assert.strictEqual(data2, "myquery");
+        assert.isUndefined(data3);
     });
 
     test("test sub action handler with empty query", function() {
         var data1 = "";
         var data2 = "";
-        actionHandler.onMenuItemSelected("action", function(selectedItem, query) {
+        actionHandler.onMenuItemSelected("action", function(query, selectedItem, selectedItemData) {
             data1 = selectedItem;
             data2 = query;
         });
@@ -284,7 +286,7 @@ suite("#ActionHandlerTest", function() {
             data0 = query;
         });
 
-        actionHandler.onMenuItemSelected("action", function(selectedItem, query) {
+        actionHandler.onMenuItemSelected("action", function(query, selectedItem) {
             data1 = selectedItem;
             data2 = query;
         });

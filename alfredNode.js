@@ -5,18 +5,13 @@ var Workflow = (function() {
     var handlers = {};
     var clearItems = function() {
         _items = [];
-        Storage.remove("wfData");
+        clearItemsData();
     };
 
     var addItem = function(item) {
-        if(item.data) {
-            var wfData = Storage.get("wfData");
-            wfData = wfData || {};
-            wfData[item.title] = item.data;
-            Storage.set("wfData", wfData);
-        }
+        saveItemData(item);
 
-        if(item.hasSubItems) {
+        if (item.hasSubItems) {
             item.autocomplete = item.title + Utils.SUB_ACTION_SEPARATOR;
         }
 
@@ -113,9 +108,10 @@ var ActionHandler = (function() {
             } else {
                 // handle sub action
                 var tmp = query.split(Utils.SUB_ACTION_SEPARATOR);
-                var selectedItem = tmp[0].trim();
+                var selectedItemTitle = tmp[0].trim();
                 query = tmp[1].trim();
-                eventEmitter.emit("menuItemSelected-" + action, selectedItem, query);
+
+                eventEmitter.emit("menuItemSelected-" + action, query, selectedItemTitle, getItemData(selectedItemTitle));
             }
         },
 
@@ -335,6 +331,25 @@ function _removeEmptyProperties(data) {
     }
 
     return data;
+}
+
+// save item data into storage as "item title" => item data
+function saveItemData(item) {
+    if (item.data) {
+        var wfData = Storage.get("wfData");
+        wfData = wfData || {};
+        wfData[item.title] = item.data;
+        Storage.set("wfData", wfData);
+    }
+}
+
+function clearItemsData(item) {
+    Storage.remove("wfData");
+}
+
+function getItemData(itemTitle) {
+    var wfData = Storage.get("wfData");
+    return wfData ? wfData[itemTitle] : undefined;
 }
 
 // module export
