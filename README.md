@@ -177,3 +177,4 @@ https://bitbucket.org/giangvo_Atlassian/alfred-workflow-nodejs
 * 0.0.5 Add default workflow
 * 1.0.0 Stable release
 * 1.0.1 Add info/warning/error message for workflow. Add some built-in icons.
+* 1.0.2 Bugs fix
