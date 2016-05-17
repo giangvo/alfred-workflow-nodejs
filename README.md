@@ -263,3 +263,4 @@ https://github.com/giangvo/alfred-workflow-nodejs
 * 1.0.1 Add info/warning/error message for workflow. Add some built-in icons.
 * 1.0.2 Bugs fix
 * 1.1.0 Add menu system
+* 1.1.1 Track usage of menu system

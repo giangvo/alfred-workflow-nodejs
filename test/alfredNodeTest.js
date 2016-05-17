@@ -416,13 +416,13 @@ suite("#Settings test", function() {
         assert.isUndefined(Settings.get("username"));
     });
 
-    test("test set password", function(done) {
+    /*test("test set password", function(done) {
         Settings.setPassword("user1", "mypass");
         Settings.getPassword("user1", function(error, password) {
             assert.strictEqual(password, "mypass");
             done();
         });
-    });
+    });*/
 });
 
 suite("#Utils test", function() {
