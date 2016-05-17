@@ -366,6 +366,7 @@ function clearItemsData(item) {
 }
 
 function getItemData(itemTitle) {
+    itemTitle = typeof itemTitle === "string" ? itemTitle.normalize() : itemTitle;
     var wfData = Storage.get("wfData");
     return wfData ? wfData[itemTitle] : undefined;
 }
