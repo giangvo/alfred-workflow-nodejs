@@ -1,3 +1,4 @@
+var _ = require('underscore');
 // === WorkFlow ===
 var Workflow = (function() {
     var _items = [];
@@ -24,9 +25,24 @@ var Workflow = (function() {
             encoding: 'UTF-8'
         });
 
-        var ele = root.ele({
-            items: _items
+        var usage = Storage.get("usage");
+        usage = usage || {};
+
+        _.each(_items, function(item) {
+            var title = item.item.title;
+            item.count = usage[title] ? (0 - usage[title]) : 0;
         });
+
+        var sortedItems = _.sortBy(_items, "count");
+
+        _.each(sortedItems, function(item) {
+            delete item.count;
+        });
+
+        var ele = root.ele({
+            items: sortedItems
+        });
+
         var ret = ele.end();
         console.log(ret);
         return ret;
@@ -110,6 +126,8 @@ var ActionHandler = (function() {
                 var tmp = query.split(Utils.SUB_ACTION_SEPARATOR);
                 var selectedItemTitle = tmp[0].trim();
                 query = tmp[1].trim();
+
+                saveUsage(query, selectedItemTitle);
 
                 eventEmitter.emit("menuItemSelected-" + action, query, selectedItemTitle, getItemData(selectedItemTitle));
             }
@@ -351,6 +369,19 @@ function getItemData(itemTitle) {
     itemTitle = typeof itemTitle === "string" ? itemTitle.normalize() : itemTitle;
     var wfData = Storage.get("wfData");
     return wfData ? wfData[itemTitle] : undefined;
+}
+
+function saveUsage(query, itemTitle) {
+    if (!query) {
+        var usage = Storage.get("usage");
+        usage = usage || {};
+
+        var count = usage[itemTitle];
+        count = count || 0;
+        usage[itemTitle] = count + 1;
+
+        Storage.set("usage", usage);
+    }
 }
 
 // module export

@@ -6,6 +6,7 @@ var AlfredNode = require("../alfredNode.js");
 var wf = AlfredNode.workflow;
 var utils = AlfredNode.utils;
 var Item = AlfredNode.Item;
+var storage = AlfredNode.storage;
 
 suite("#Integration test", function() {
     var actionHandler = AlfredNode.actionHandler;
@@ -46,8 +47,6 @@ suite("#Integration test", function() {
 
     it("interation test", function() {
         (function main() {
-            process.argv = ["", "", "action", "myquery"];
-
             var feedback = "";
             var data;
             actionHandler.onAction("action", function(query) {
@@ -66,15 +65,21 @@ suite("#Integration test", function() {
             });
 
             wf.clearItems();
+            storage.clear();
 
+            // test no items found
+            process.argv = ["", "", "action", "myquery"];
             AlfredNode.run();
             assert.strictEqual('<?xml version="1.0" encoding="UTF-8"?><root><items/></root>', feedback);
+            wf.clearItems();
 
+            // test 1 item found
             process.argv = ["", "", "action", "ka"];
             AlfredNode.run();
             assert.strictEqual('<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO" autocomplete="Kat' + utils.SUB_ACTION_SEPARATOR + '"><title>Kat</title><subtitle>10</subtitle></item></items></root>', feedback);
             wf.clearItems();
 
+            // test with empty query => all items should be returned
             process.argv = ["", "", "action", ""];
             AlfredNode.run();
             assert.strictEqual('<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO" autocomplete="Alex' + utils.SUB_ACTION_SEPARATOR + '"><title>Alex</title><subtitle>20</subtitle></item><item valid="NO" autocomplete="David' + utils.SUB_ACTION_SEPARATOR + '"><title>David</title><subtitle>30</subtitle></item><item valid="NO" autocomplete="Kat' + utils.SUB_ACTION_SEPARATOR + '"><title>Kat</title><subtitle>10</subtitle></item></items></root>', feedback);
@@ -85,6 +90,37 @@ suite("#Integration test", function() {
             AlfredNode.run();
             assert.strictEqual('<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>Menu Item 1: abc</title><subtitle>Alex</subtitle></item></items></root>', feedback);
             wf.clearItems();
+
+            // test item usages are tracked
+            storage.clear();
+            process.argv = ["", "", "action", "Alex" + AlfredNode.utils.SUB_ACTION_SEPARATOR + ""];
+            AlfredNode.run();
+            var usage = storage.get("usage");
+            assert.strictEqual(1, usage['Alex']); // usage should be tracked
+
+            process.argv = ["", "", "action", "Alex" + AlfredNode.utils.SUB_ACTION_SEPARATOR + ""];
+            AlfredNode.run();
+            var usage = storage.get("usage");
+            assert.strictEqual(2, usage['Alex']); // usage should be increased
+
+            process.argv = ["", "", "action", "Alex" + AlfredNode.utils.SUB_ACTION_SEPARATOR + "abc"];
+            AlfredNode.run();
+            var usage = storage.get("usage");
+            assert.strictEqual(2, usage['Alex']); // usage should NOT be increased when `query` is not empty
+            wf.clearItems();
+            storage.clear();
+
+            // test items are sorted
+            process.argv = ["", "", "action", ""];
+            storage.set("usage", {
+                "Kat": 1,
+                "David": 2
+            });
+
+            AlfredNode.run();
+            assert.strictEqual('<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO" autocomplete="David $>"><title>David</title><subtitle>30</subtitle></item><item valid="NO" autocomplete="Kat $>"><title>Kat</title><subtitle>10</subtitle></item><item valid="NO" autocomplete="Alex $>"><title>Alex</title><subtitle>20</subtitle></item></items></root>', feedback);
+            wf.clearItems();
+            storage.clear();
         })();
     });
 });
