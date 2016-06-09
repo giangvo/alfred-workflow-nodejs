@@ -20,16 +20,12 @@ var Workflow = (function() {
     };
 
     var feedback = function() {
-        var root = require('xmlbuilder').create('root', {
-            version: '1.0',
-            encoding: 'UTF-8'
-        });
 
         var usage = Storage.get("usage");
         usage = usage || {};
 
         _.each(_items, function(item) {
-            var title = item.item.title;
+            var title = item.title;
             item.count = usage[title] ? (0 - usage[title]) : 0;
         });
 
@@ -39,11 +35,10 @@ var Workflow = (function() {
             delete item.count;
         });
 
-        var ele = root.ele({
+        var ret = JSON.stringify({ 
             items: sortedItems
         });
 
-        var ret = ele.end();
         console.log(ret);
         return ret;
     };
@@ -151,18 +146,20 @@ function Item(data) {
 
 Item.prototype.feedback = function() {
     var item = _removeEmptyProperties({
-        "@uid": this.uid,
-        "@arg": this.arg,
-        "@valid": this.valid === true ? "YES" : "NO",
-        "@autocomplete": this.autocomplete,
+        "uid": this.uid,
+        "arg": this.arg,
+        "valid": this.valid === true ? "YES" : "NO",
+        "autocomplete": this.autocomplete,
         "title": this.title,
         "subtitle": this.subtitle,
-        "icon": this.icon
+        "icon": {
+            "path": this.icon
+        },
+        "quicklookurl": this.quicklookurl,
+        "mods": this.mods
     });
 
-    return {
-        item: item
-    };
+    return item;
 };
 
 // === Storage
