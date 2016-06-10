@@ -340,6 +340,12 @@ var ICONS = (function() {
 function _removeEmptyProperties(data) {
     for (var key in data) {
         var value = data[key];
+        if (typeof value === 'object') {
+            value = _removeEmptyProperties(value);
+            if (!Object.keys(value).length) {
+                value = null;
+            }
+        }
         if (value === undefined || value === null) {
             delete data[key];
         }
