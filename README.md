@@ -1,6 +1,8 @@
 Alfred Workflow Nodejs Library
 =========
 
+### This branch (alfred-2) is for Alfred 2 workflows (legacy xml) - master branch is for Alfred 3 workflows
+
 ## Overview
 
 A small library providing helpers to create Alfred Workflow
