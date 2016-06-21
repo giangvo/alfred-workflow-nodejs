@@ -70,25 +70,25 @@ suite("#Integration test", function() {
             // test no items found
             process.argv = ["", "", "action", "myquery"];
             AlfredNode.run();
-            assert.strictEqual('<?xml version="1.0" encoding="UTF-8"?><root><items/></root>', feedback);
+            assert.strictEqual('{"items":[]}', feedback);
             wf.clearItems();
 
             // test 1 item found
             process.argv = ["", "", "action", "ka"];
             AlfredNode.run();
-            assert.strictEqual('<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO" autocomplete="Kat' + utils.SUB_ACTION_SEPARATOR + '"><title>Kat</title><subtitle>10</subtitle></item></items></root>', feedback);
+            assert.strictEqual('{"items":[{"valid":"NO","autocomplete":"Kat' + utils.SUB_ACTION_SEPARATOR + '","title":"Kat","subtitle":"10"}]}', feedback);
             wf.clearItems();
 
             // test with empty query => all items should be returned
             process.argv = ["", "", "action", ""];
             AlfredNode.run();
-            assert.strictEqual('<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO" autocomplete="Alex' + utils.SUB_ACTION_SEPARATOR + '"><title>Alex</title><subtitle>20</subtitle></item><item valid="NO" autocomplete="David' + utils.SUB_ACTION_SEPARATOR + '"><title>David</title><subtitle>30</subtitle></item><item valid="NO" autocomplete="Kat' + utils.SUB_ACTION_SEPARATOR + '"><title>Kat</title><subtitle>10</subtitle></item></items></root>', feedback);
+            assert.strictEqual('{"items":[{"valid":"NO","autocomplete":"Alex' + utils.SUB_ACTION_SEPARATOR + '","title":"Alex","subtitle":"20"},{"valid":"NO","autocomplete":"David' + utils.SUB_ACTION_SEPARATOR + '","title":"David","subtitle":"30"},{"valid":"NO","autocomplete":"Kat' + utils.SUB_ACTION_SEPARATOR + '","title":"Kat","subtitle":"10"}]}', feedback);
             wf.clearItems();
 
             // test menuitem
             process.argv = ["", "", "action", "Alex" + AlfredNode.utils.SUB_ACTION_SEPARATOR + "abc"];
             AlfredNode.run();
-            assert.strictEqual('<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>Menu Item 1: abc</title><subtitle>Alex</subtitle></item></items></root>', feedback);
+            assert.strictEqual('{"items":[{"valid":"NO","title":"Menu Item 1: abc","subtitle":"Alex"}]}', feedback);
             wf.clearItems();
 
             // test item usages are tracked
@@ -118,7 +118,7 @@ suite("#Integration test", function() {
             });
 
             AlfredNode.run();
-            assert.strictEqual('<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO" autocomplete="David $>"><title>David</title><subtitle>30</subtitle></item><item valid="NO" autocomplete="Kat $>"><title>Kat</title><subtitle>10</subtitle></item><item valid="NO" autocomplete="Alex $>"><title>Alex</title><subtitle>20</subtitle></item></items></root>', feedback);
+            assert.strictEqual('{"items":[{"valid":"NO","autocomplete":"David $>","title":"David","subtitle":"30"},{"valid":"NO","autocomplete":"Kat $>","title":"Kat","subtitle":"10"},{"valid":"NO","autocomplete":"Alex $>","title":"Alex","subtitle":"20"}]}', feedback);
             wf.clearItems();
             storage.clear();
         })();

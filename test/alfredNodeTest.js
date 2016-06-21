@@ -17,10 +17,8 @@ suite("#ItemTest", function() {
             "title": "title"
         });
         var expectedObj = {
-            "item": {
-                "title": "title",
-                "@valid": "NO"
-            }
+            "title": "title",
+            "valid": "NO"
         };
 
         assert.deepEqual(item.feedback(), expectedObj);
@@ -32,10 +30,8 @@ suite("#ItemTest", function() {
             "valid": true
         });
         var expectedObj = {
-            "item": {
-                "title": "title",
-                "@valid": "YES"
-            }
+            "title": "title",
+            "valid": "YES"
         };
 
         assert.deepEqual(item.feedback(), expectedObj);
@@ -48,7 +44,7 @@ suite("#WorkflowTest", function() {
     });
 
     test("generate empty feeback", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items/></root>';
+        var expectedObj = '{"items":[]}';
 
         var ret = workflow.feedback();
 
@@ -56,7 +52,7 @@ suite("#WorkflowTest", function() {
     });
 
     test("generate 1 feeback", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>title</title></item></items></root>';
+        var expectedObj = '{"items":[{"valid":"NO","title":"title"}]}';
         var item = new Item({
             "title": "title"
         });
@@ -70,7 +66,7 @@ suite("#WorkflowTest", function() {
     });
 
     test("generate feeback with data", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>title a</title></item></items></root>';
+        var expectedObj = '{"items":[{"valid":"NO","title":"title a"}]}';
         var item = new Item({
             "title": "title a",
             "data": {count: 1}
@@ -87,7 +83,7 @@ suite("#WorkflowTest", function() {
     });
 
     test("generate feeback which has sub items", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO" autocomplete="item has subItems' + Utils.SUB_ACTION_SEPARATOR + '"><title>item has subItems</title></item></items></root>';
+        var expectedObj = '{"items":[{"valid":"NO","autocomplete":"item has subItems' + Utils.SUB_ACTION_SEPARATOR + '","title":"item has subItems"}]}'
         var item = new Item({
             "title": "item has subItems",
             "hasSubItems": true
@@ -103,7 +99,7 @@ suite("#WorkflowTest", function() {
     });
 
     test("generate 2 feeback", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item uid="1" valid="YES"><title>title 1.1</title></item><item uid="2" valid="NO"><title>title 1.2</title></item></items></root>';
+        var expectedObj = '{"items":[{"uid":"1","valid":"YES","title":"title 1.1"},{"uid":"2","valid":"NO","title":"title 1.2"}]}'
         var item = new Item({
             "title": "title 1.1",
             "valid": true,
@@ -127,7 +123,7 @@ suite("#WorkflowTest", function() {
     });
 
     test("clear items", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items/></root>';
+        var expectedObj = '{"items":[]}'
         var item = new Item({
             "title": "title"
         });
@@ -142,15 +138,14 @@ suite("#WorkflowTest", function() {
     });
 
     test("generate error feeback", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf error</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertStopIcon.icns</icon></item></items></root>';
-        
+        var expectedObj = '{"items":[{"valid":"NO","title":"wf error","icon":{"path":"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertStopIcon.icns"}}]}'
         var ret = workflow.error("wf error");
 
         assert.strictEqual(ret, expectedObj);
     });
 
     test("generate error feeback with 1 added item", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf error</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertStopIcon.icns</icon></item></items></root>';
+        var expectedObj = '{"items":[{"valid":"NO","title":"wf error","icon":{"path":"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertStopIcon.icns"}}]}'
         
         var item = new Item({
             "title": "title"
@@ -163,7 +158,7 @@ suite("#WorkflowTest", function() {
     });
 
     test("generate warning feeback", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf warning</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionIcon.icns</icon></item></items></root>';
+        var expectedObj = '{"items":[{"valid":"NO","title":"wf warning","icon":{"path":"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionIcon.icns"}}]}'
         
         var ret = workflow.warning("wf warning");
 
@@ -171,7 +166,7 @@ suite("#WorkflowTest", function() {
     });
 
     test("generate warning feeback with 1 added item", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf warning</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionIcon.icns</icon></item></items></root>';
+        var expectedObj = '{"items":[{"valid":"NO","title":"wf warning","icon":{"path":"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionIcon.icns"}}]}'
         
         var item = new Item({
             "title": "title"
@@ -184,7 +179,7 @@ suite("#WorkflowTest", function() {
     });
 
     test("generate info feeback", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf info</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns</icon></item></items></root>';
+        var expectedObj = '{"items":[{"valid":"NO","title":"wf info","icon":{"path":"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns"}}]}'
         
         var ret = workflow.info("wf info");
 
@@ -192,7 +187,7 @@ suite("#WorkflowTest", function() {
     })
 
     test("generate info feeback with 1 added item", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf info</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns</icon></item></items></root>';
+        var expectedObj = '{"items":[{"valid":"NO","title":"wf info","icon":{"path":"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns"}}]}'
         
         var item = new Item({
             "title": "title"
