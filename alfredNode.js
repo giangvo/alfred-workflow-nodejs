@@ -1,4 +1,6 @@
+var exec = require('child_process').exec;
 var _ = require('underscore');
+var utils = require("util");
 // === WorkFlow ===
 var Workflow = (function() {
     var _items = [];
@@ -35,7 +37,7 @@ var Workflow = (function() {
             delete item.count;
         });
 
-        var ret = JSON.stringify({ 
+        var ret = JSON.stringify({
             items: sortedItems
         });
 
@@ -145,6 +147,8 @@ function Item(data) {
 }
 
 Item.prototype.feedback = function() {
+    this.arg = _updateArg(this.arg);
+
     var item = _removeEmptyProperties({
         "uid": this.uid,
         "arg": this.arg,
@@ -303,6 +307,115 @@ var Utils = (function() {
             executeFile: function(path, varibale, handler) {
                 applescript.executeFile.apply(this, arguments);
             }
+        },
+
+
+        /**
+         * @param data: {arg: 'xyz', variables: {key: value}}
+         * @return 
+         *     string of '{"alfredworkflow": {"arg": "xyz", "variables": {"key": "value"}}}'
+         *     or data if data is not type of object
+         */
+        generateVars: function(data) {
+            var ret = _updateArg(data);
+            console.log(ret);
+            return ret;
+        },
+
+        /**
+         * Set enviroment variable
+         * if value is object => store as json string
+         */
+        setEnv: function(key, value) {
+            if (key !== undefined && value !== undefined) {
+                if (typeof value === 'object') {
+                    process.env.key = JSON.stringify(value);
+                } else {
+                    process.env.key = value;
+                }
+            }
+        },
+
+        /**
+         * Get enviroment variable
+         * if data is json => parse and return object
+         */
+        getEnv: function(key) {
+            return _toObjectIfJSONString(process.env[key]);
+        },
+
+        /**
+         * Set wf enviroment variable
+         * @param key variable name
+         * @param value variable value
+         * @param callback callback(err)
+         */
+        setWfEnv: function(key, value, callback) {
+            if (key !== undefined && value !== undefined) {
+                // set variable to plist
+                var setCommand = utils.format('/usr/libexec/PlistBuddy -c "Set :variables:%s \"%s\"" info.plist', key, value);
+                exec(setCommand, function(err, stdout, stderr) {
+                    // if variable is not in plist => add it to plist
+                    if (err) {
+                        var addCommand = utils.format('/usr/libexec/PlistBuddy -c "Add :variables:%s string \"%s\"" info.plist', key, value);
+                        exec(addCommand, function(err, stdout, stderr) {
+                            if (callback) {
+                                callback(_toUndefinedIfNull(err));
+                            };
+                        });
+                    } else {
+                        if (callback) {
+                            callback(undefined);
+                        };
+                    }
+                })
+            }
+        },
+
+        /**
+         * @param key variable name
+         * @param callback callback(err, value)
+         * @return wf enviroment variable
+         */
+        getWfEnv: function(key, callback) {
+            var getCommand = utils.format('/usr/libexec/PlistBuddy -c "Print :variables:%s" info.plist', key);
+            exec(getCommand, function(err, stdout, stderr) {
+                if (err) {
+                    callback(err);
+                } else {
+                    var value = stdout.trim();
+                    callback(undefined, value);
+                }
+
+            })
+        },
+
+        /**
+         * Remove a variable from wf's env variables
+         * @param key variable name
+         * @param callback callback(err)
+         */
+        removeWfEnv: function(key, callback) {
+            var getCommand = utils.format('/usr/libexec/PlistBuddy -c "Delete :variables:%s" info.plist', key);
+            exec(getCommand, function(err, stdout, stderr) {
+                if (callback) {
+                    callback(_toUndefinedIfNull(err));
+                };
+            })
+        },
+
+        /**
+         * Use with caution!!!
+         * clear all workflow enviroment variables
+         * @param callback callback(err)
+         */
+        clearWfEnv: function(callback) {
+            var clearCommand = '/usr/libexec/PlistBuddy -c "Delete :variables" info.plist';
+            exec(clearCommand, function(err, stdout, stderr) {
+                if (callback) {
+                    callback(_toUndefinedIfNull(err))
+                };
+            })
         }
     };
 })();
@@ -385,6 +498,39 @@ function saveUsage(query, itemTitle) {
 
         Storage.set("usage", usage);
     }
+}
+
+function _updateArg(data) {
+    if (typeof data === "object") {
+        var _arg = data.arg;
+        var _variables = data.variables;
+        return JSON.stringify({
+            alfredworkflow: {
+                arg: _arg,
+                variables: _variables
+            }
+        });
+    }
+
+    return data;
+}
+
+function _toUndefinedIfNull(x) {
+    return x === null ? undefined : x;
+}
+
+/**
+ * If str is json string => return object
+ * If not, return str
+ */
+function _toObjectIfJSONString(str) {
+    try {
+        str = JSON.parse(str);
+    } catch (err) {
+
+    }
+
+    return str;
 }
 
 // module export
