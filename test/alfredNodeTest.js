@@ -17,10 +17,8 @@ suite("#ItemTest", function() {
             "title": "title"
         });
         var expectedObj = {
-            "item": {
-                "title": "title",
-                "@valid": "NO"
-            }
+            "title": "title",
+            "valid": "NO"
         };
 
         assert.deepEqual(item.feedback(), expectedObj);
@@ -32,10 +30,8 @@ suite("#ItemTest", function() {
             "valid": true
         });
         var expectedObj = {
-            "item": {
-                "title": "title",
-                "@valid": "YES"
-            }
+            "title": "title",
+            "valid": "YES"
         };
 
         assert.deepEqual(item.feedback(), expectedObj);
@@ -48,7 +44,7 @@ suite("#WorkflowTest", function() {
     });
 
     test("generate empty feeback", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items/></root>';
+        var expectedObj = '{"items":[]}';
 
         var ret = workflow.feedback();
 
@@ -56,7 +52,7 @@ suite("#WorkflowTest", function() {
     });
 
     test("generate 1 feeback", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>title</title></item></items></root>';
+        var expectedObj = '{"items":[{"valid":"NO","title":"title"}]}';
         var item = new Item({
             "title": "title"
         });
@@ -70,10 +66,12 @@ suite("#WorkflowTest", function() {
     });
 
     test("generate feeback with data", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>title a</title></item></items></root>';
+        var expectedObj = '{"items":[{"valid":"NO","title":"title a"}]}';
         var item = new Item({
             "title": "title a",
-            "data": {count: 1}
+            "data": {
+                count: 1
+            }
         });
         workflow.addItem(item);
 
@@ -82,12 +80,52 @@ suite("#WorkflowTest", function() {
         assert.strictEqual(ret, expectedObj);
 
         var wfData = storage.get("wfData");
-        assert.strictEqual(wfData["title a"].count, 1);        
+        assert.strictEqual(wfData["title a"].count, 1);
 
     });
 
+    test("generate feeback with string arg", function() {
+        var expectedObj = '{"items":[{"arg":"arg","valid":"NO","title":"title"}]}';
+        var item = new Item({
+            'title': 'title',
+            'arg': 'arg'
+        });
+        workflow.addItem(item);
+
+        var ret = workflow.feedback();
+
+        assert.strictEqual(ret, expectedObj);
+
+        assert.isUndefined(storage.get("wfData"), "should not have wf data");
+    });
+
+    test("generate feeback with variables in arg", function() {
+        var expectedObj = '{"items":[{"arg":"{\\"alfredworkflow\\":{\\"arg\\":\\"arg\\",\\"variables\\":{\\"key\\":\\"value\\"}}}","valid":"NO","title":"title"}]}';
+        var item = new Item({
+            'title': 'title',
+            'arg': {
+                arg: 'arg',
+                variables: {
+                    key: 'value'
+                }
+            }
+        });
+        workflow.addItem(item);
+
+        var ret = workflow.feedback();
+
+        assert.strictEqual(ret, expectedObj);
+
+        var jsonObj = JSON.parse(ret);
+        var arg = JSON.parse(jsonObj.items[0].arg);
+        assert.strictEqual(arg.alfredworkflow.arg, 'arg');
+        assert.strictEqual(arg.alfredworkflow.variables.key, 'value');
+
+        assert.isUndefined(storage.get("wfData"), "should not have wf data");
+    });
+
     test("generate feeback which has sub items", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO" autocomplete="item has subItems' + Utils.SUB_ACTION_SEPARATOR + '"><title>item has subItems</title></item></items></root>';
+        var expectedObj = '{"items":[{"valid":"NO","autocomplete":"item has subItems' + Utils.SUB_ACTION_SEPARATOR + '","title":"item has subItems"}]}'
         var item = new Item({
             "title": "item has subItems",
             "hasSubItems": true
@@ -103,7 +141,7 @@ suite("#WorkflowTest", function() {
     });
 
     test("generate 2 feeback", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item uid="1" valid="YES"><title>title 1.1</title></item><item uid="2" valid="NO"><title>title 1.2</title></item></items></root>';
+        var expectedObj = '{"items":[{"uid":"1","valid":"YES","title":"title 1.1"},{"uid":"2","valid":"NO","title":"title 1.2"}]}'
         var item = new Item({
             "title": "title 1.1",
             "valid": true,
@@ -113,7 +151,9 @@ suite("#WorkflowTest", function() {
             "title": "title 1.2",
             "valid": false,
             "uid": "2",
-            "data": {count: 1}
+            "data": {
+                count: 1
+            }
         });
         workflow.addItem(item);
         workflow.addItem(item2);
@@ -123,11 +163,11 @@ suite("#WorkflowTest", function() {
         assert.strictEqual(ret, expectedObj);
 
         var wfData = storage.get("wfData");
-        assert.strictEqual(wfData["title 1.2"].count, 1);        
+        assert.strictEqual(wfData["title 1.2"].count, 1);
     });
 
     test("clear items", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items/></root>';
+        var expectedObj = '{"items":[]}'
         var item = new Item({
             "title": "title"
         });
@@ -142,16 +182,15 @@ suite("#WorkflowTest", function() {
     });
 
     test("generate error feeback", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf error</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertStopIcon.icns</icon></item></items></root>';
-        
+        var expectedObj = '{"items":[{"valid":"NO","title":"wf error","icon":{"path":"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertStopIcon.icns"}}]}'
         var ret = workflow.error("wf error");
 
         assert.strictEqual(ret, expectedObj);
     });
 
     test("generate error feeback with 1 added item", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf error</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertStopIcon.icns</icon></item></items></root>';
-        
+        var expectedObj = '{"items":[{"valid":"NO","title":"wf error","icon":{"path":"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertStopIcon.icns"}}]}'
+
         var item = new Item({
             "title": "title"
         });
@@ -163,16 +202,16 @@ suite("#WorkflowTest", function() {
     });
 
     test("generate warning feeback", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf warning</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionIcon.icns</icon></item></items></root>';
-        
+        var expectedObj = '{"items":[{"valid":"NO","title":"wf warning","icon":{"path":"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionIcon.icns"}}]}'
+
         var ret = workflow.warning("wf warning");
 
         assert.strictEqual(ret, expectedObj);
     });
 
     test("generate warning feeback with 1 added item", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf warning</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionIcon.icns</icon></item></items></root>';
-        
+        var expectedObj = '{"items":[{"valid":"NO","title":"wf warning","icon":{"path":"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionIcon.icns"}}]}'
+
         var item = new Item({
             "title": "title"
         });
@@ -184,21 +223,21 @@ suite("#WorkflowTest", function() {
     });
 
     test("generate info feeback", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf info</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns</icon></item></items></root>';
-        
+        var expectedObj = '{"items":[{"valid":"NO","title":"wf info","icon":{"path":"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns"}}]}'
+
         var ret = workflow.info("wf info");
 
         assert.strictEqual(ret, expectedObj);
     })
 
     test("generate info feeback with 1 added item", function() {
-        var expectedObj = '<?xml version="1.0" encoding="UTF-8"?><root><items><item valid="NO"><title>wf info</title><icon>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns</icon></item></items></root>';
-        
+        var expectedObj = '{"items":[{"valid":"NO","title":"wf info","icon":{"path":"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns"}}]}'
+
         var item = new Item({
             "title": "title"
         });
         workflow.addItem(item);
-        
+
         var ret = workflow.info("wf info");
 
         assert.strictEqual(ret, expectedObj);
@@ -450,12 +489,89 @@ suite("#Utils test", function() {
         results = Utils.filter("abcdef", list, keyBuilder);
         assert.strictEqual(results.length, 0);
     });
+
+    test("test generate variables", function() {
+        var data = {
+            arg: 'xyz',
+            variables: {
+                key: 'value'
+            }
+        }
+
+        var ret = Utils.generateVars(data);
+        assert.strictEqual(ret, '{"alfredworkflow":{"arg":"xyz","variables":{"key":"value"}}}');
+    });
+
+    test("test generate variables with empty variables", function() {
+        var data = {
+            arg: 'xyz'
+        }
+
+        var ret = Utils.generateVars(data);
+        assert.strictEqual(ret, '{"alfredworkflow":{"arg":"xyz"}}');
+    });
+
+    test("test generate variables with empty arg", function() {
+        var data = {
+            variables: {
+                key: 'value'
+            }
+        }
+
+        var ret = Utils.generateVars(data);
+        assert.strictEqual(ret, '{"alfredworkflow":{"variables":{"key":"value"}}}');
+    });
+
+    test("test generate variables with input is string (not object)", function() {
+        var data = 'string arg';
+
+        var ret = Utils.generateVars(data);
+        assert.strictEqual(ret, 'string arg');
+    });
+
+    test("test generate variables with input is undefined", function() {
+        var data;
+
+        var ret = Utils.generateVars(data);
+        assert.isUndefined(ret);
+    });
+
+    test("test get/set env", function() {
+
+        Utils.setEnv('key', 'value');
+        assert.strictEqual(Utils.getEnv('key'), 'value');
+    });
+
+    test("test get/set env for obj", function() {
+
+        Utils.setEnv('key', {
+            name: 'alex'
+        });
+        assert.strictEqual(Utils.getEnv('key').name, 'alex');
+    });
+
+    test("test get/set workflow env", function(done) {
+        var ret;
+        Utils.clearWfEnv(function(error) {
+            Utils.setWfEnv('key', 'value', function(error) {
+                assert.isUndefined(error);
+
+                Utils.getWfEnv('key', function(err, value) {
+                    assert.isUndefined(error);
+                    ret = value;
+                    assert.strictEqual(ret, 'value');
+                    Utils.clearWfEnv();
+                    done();
+                })
+            });
+        });
+    }); 
 });
 
 suite("Icons tests", function() {
     var ICONS = AlfredNode.ICONS;
     var fs = require("fs");
-    
+
     test("Check icons exist", function() {
         assert.isTrue(fs.existsSync(ICONS.ACCOUNT));
         assert.isTrue(fs.existsSync(ICONS.BURN));
