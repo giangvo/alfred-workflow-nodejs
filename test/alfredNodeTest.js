@@ -538,34 +538,35 @@ suite("#Utils test", function() {
 
     test("test get/set env", function() {
 
-        Utils.setEnv('key', 'value');
-        assert.strictEqual(Utils.getEnv('key'), 'value');
+        Utils.envVars.set('key', 'value');
+        assert.strictEqual(Utils.envVars.get('key'), 'value');
     });
 
     test("test get/set env for obj", function() {
 
-        Utils.setEnv('key', {
+        Utils.envVars.set('key', {
             name: 'alex'
         });
-        assert.strictEqual(Utils.getEnv('key').name, 'alex');
+        assert.strictEqual(Utils.envVars.get('key').name, 'alex');
     });
 
-    test("test get/set workflow env", function(done) {
+    test("test get/set workflow var", function(done) {
+        var wfVars = Utils.wfVars;
         var ret;
-        Utils.clearWfEnv(function(error) {
-            Utils.setWfEnv('key', 'value', function(error) {
+        wfVars.clear(function(error) {
+            wfVars.set('key', 'value', function(error) {
                 assert.isUndefined(error);
 
-                Utils.getWfEnv('key', function(err, value) {
+                wfVars.get('key', function(err, value) {
                     assert.isUndefined(error);
                     ret = value;
                     assert.strictEqual(ret, 'value');
-                    Utils.clearWfEnv();
+                    wfVars.clear();
                     done();
                 })
             });
         });
-    }); 
+    });
 });
 
 suite("Icons tests", function() {

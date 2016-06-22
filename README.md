@@ -1,5 +1,6 @@
-Alfred Workflow Nodejs Library
+Alfred 3 Workflow Nodejs Library
 =========
+### (For Alfred 2 legaxy xml workflows, use version 1.1.1)
 
 ## Overview
 
@@ -69,10 +70,14 @@ workflow.setName("example-alfred-workflow-using-nodejs");
     * uid
     * title
     * subtitle
-    * arg
+    * arg (support variables in arg, alfred 3)
     * icon
     * valid(true/false, default is false)
     * autocomplete
+    * type
+    * quicklookurl
+    * text
+    * mods
 
 ```js
 var Item = AlfredNode.Item;
@@ -90,6 +95,29 @@ workflow.feedback();
 workflow.info("title", "subtitle");
 workflow.warning("title", "subtitle");
 workflow.error("title", "subtitle");
+
+```
+
+### Setting variables
+* Set variables via script output
+```js
+AlfredNode.utils.generateVars({arg: 'xyz', variables: {key: value}};
+// output
+'{"alfredworkflow": {"arg": "xyz", "variables": {"key": "value"}}}'
+```
+* Set variables via wf feedback item
+```js
+var Item = AlfredNode.Item;
+var item = new Item({title: "item 1", arg: {arg: 'xyz', variables: {key: value}}});
+workflow.addItem(item);
+workflow.feedback();
+// output:
+{"items": [
+    {
+     "title": "item 1",
+     "arg": "{\"alfredworkflow\": {\"arg\": \"xyz\", \"variables\": {\"key\": \"value\"}}}"
+     }
+]}
 
 ```
 
@@ -237,6 +265,25 @@ utils.filter("pen", [{name: "pencil"}, {name: "pen"}, {name: "book"}], function(
 // => return [{name: "pencil"}, {name: "pen"}]
 ```
 
+* generateVars: set variables via script output (see "Setting variables" section above for usage)
+* envVars: methods for enviroment variables
+    * set(key, value) - value can be string or object. If value is object, it is stored as json string
+    * get(key) - if stored value is object, this method will parse json string to object and return
+* wfVars: methods for workflow variables
+    * set(key, value, [callback]) 
+        * key: variable name
+        * value: need to be string **(object value is not supported)**
+        * callback: callback(error) - optional
+    * get(key, callback)
+        * key: variable name
+        * callback: callback(error, value)
+    * remove(key, callback)
+        * key: variable name
+        * callback: callback(error) - optional
+    * clear(key, callback) - **Clear all** wf variables
+        * key: variable name
+        * callback: callback(error) - optional
+
 ### Icons - Some built-in icons
 Icons are from "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources"
 
@@ -253,14 +300,11 @@ You can look at some tests in test folder in source code get more about usage
 ## Source code and document
 https://github.com/giangvo/alfred-workflow-nodejs
 
-## Release History
-* 0.0.1 Initial release
-* 0.0.2 Fix bug storage
-* 0.0.3 Add workflow skeleton
-* 0.0.4 Add more docs and update git repo
-* 0.0.5 Add default workflow
-* 1.0.0 Stable release
-* 1.0.1 Add info/warning/error message for workflow. Add some built-in icons.
-* 1.0.2 Bugs fix
-* 1.1.0 Add menu system
-* 1.1.1 Track usage of menu system
+## Release notes (Alfred 2)
+* 0.x.x -> 1.x.x : for Alfred 2 workflow
+* 2.0: Alfred 3 workflow
+    * Return feedback as JSON
+    * Support variables in 'arg' of feedback items
+    * Add Utils.generateVars method to set variables
+    * Add: Utils.envVars with set/get methods to set/get enviroment variables
+    * Add: Utils.wfVars with set/get/remove/clear to set/get/remove/clear wf variables

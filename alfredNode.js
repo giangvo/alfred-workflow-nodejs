@@ -156,10 +156,12 @@ Item.prototype.feedback = function() {
         "autocomplete": this.autocomplete,
         "title": this.title,
         "subtitle": this.subtitle,
+        "type": this.type,
         "icon": {
             "path": this.icon
         },
         "quicklookurl": this.quicklookurl,
+        "text": this.text,
         "mods": this.mods
     });
 
@@ -322,101 +324,106 @@ var Utils = (function() {
             return ret;
         },
 
-        /**
-         * Set enviroment variable
-         * if value is object => store as json string
-         */
-        setEnv: function(key, value) {
-            if (key !== undefined && value !== undefined) {
-                if (typeof value === 'object') {
-                    process.env.key = JSON.stringify(value);
-                } else {
-                    process.env.key = value;
+        envVars: {
+            /**
+             * Set enviroment variable
+             * if value is object => store as json string
+             */
+            set: function(key, value) {
+                if (key !== undefined && value !== undefined) {
+                    if (typeof value === 'object') {
+                        process.env.key = JSON.stringify(value);
+                    } else {
+                        process.env.key = value;
+                    }
                 }
+            },
+
+            /**
+             * Get enviroment variable
+             * if data is json => parse and return object
+             */
+            get: function(key) {
+                return _toObjectIfJSONString(process.env[key]);
             }
         },
 
-        /**
-         * Get enviroment variable
-         * if data is json => parse and return object
-         */
-        getEnv: function(key) {
-            return _toObjectIfJSONString(process.env[key]);
-        },
-
-        /**
-         * Set wf enviroment variable
-         * @param key variable name
-         * @param value variable value
-         * @param callback callback(err)
-         */
-        setWfEnv: function(key, value, callback) {
-            if (key !== undefined && value !== undefined) {
-                // set variable to plist
-                var setCommand = utils.format('/usr/libexec/PlistBuddy -c "Set :variables:%s \"%s\"" info.plist', key, value);
-                exec(setCommand, function(err, stdout, stderr) {
-                    // if variable is not in plist => add it to plist
-                    if (err) {
-                        var addCommand = utils.format('/usr/libexec/PlistBuddy -c "Add :variables:%s string \"%s\"" info.plist', key, value);
-                        exec(addCommand, function(err, stdout, stderr) {
+        wfVars: {
+            /**
+             * Set wf variable
+             * @param key variable name
+             * @param value variable value
+             * @param callback callback(err)
+             */
+            set: function(key, value, callback) {
+                if (key !== undefined && value !== undefined) {
+                    // set variable to plist
+                    var setCommand = utils.format('/usr/libexec/PlistBuddy -c "Set :variables:%s \"%s\"" info.plist', key, value);
+                    exec(setCommand, function(err, stdout, stderr) {
+                        // if variable is not in plist => add it to plist
+                        if (err) {
+                            var addCommand = utils.format('/usr/libexec/PlistBuddy -c "Add :variables:%s string \"%s\"" info.plist', key, value);
+                            exec(addCommand, function(err, stdout, stderr) {
+                                if (callback) {
+                                    callback(_toUndefinedIfNull(err));
+                                };
+                            });
+                        } else {
                             if (callback) {
-                                callback(_toUndefinedIfNull(err));
+                                callback(undefined);
                             };
-                        });
+                        }
+                    })
+                }
+            },
+
+            /**
+             * @param key variable name
+             * @param callback callback(err, value)
+             * @return wf variable
+             */
+            get: function(key, callback) {
+                var getCommand = utils.format('/usr/libexec/PlistBuddy -c "Print :variables:%s" info.plist', key);
+                exec(getCommand, function(err, stdout, stderr) {
+                    if (err) {
+                        callback(err);
                     } else {
-                        if (callback) {
-                            callback(undefined);
-                        };
+                        var value = stdout.trim();
+                        callback(undefined, value);
                     }
+
+                })
+            },
+
+            /**
+             * Remove a variable from wf variables
+             * @param key variable name
+             * @param callback callback(err)
+             */
+            remove: function(key, callback) {
+                var getCommand = utils.format('/usr/libexec/PlistBuddy -c "Delete :variables:%s" info.plist', key);
+                exec(getCommand, function(err, stdout, stderr) {
+                    if (callback) {
+                        callback(_toUndefinedIfNull(err));
+                    };
+                })
+            },
+
+            /**
+             * Use with caution!!!
+             * clear all workflow variables
+             * @param callback callback(err)
+             */
+            clear: function(callback) {
+                var clearCommand = '/usr/libexec/PlistBuddy -c "Delete :variables" info.plist';
+                exec(clearCommand, function(err, stdout, stderr) {
+                    if (callback) {
+                        callback(_toUndefinedIfNull(err))
+                    };
                 })
             }
-        },
-
-        /**
-         * @param key variable name
-         * @param callback callback(err, value)
-         * @return wf enviroment variable
-         */
-        getWfEnv: function(key, callback) {
-            var getCommand = utils.format('/usr/libexec/PlistBuddy -c "Print :variables:%s" info.plist', key);
-            exec(getCommand, function(err, stdout, stderr) {
-                if (err) {
-                    callback(err);
-                } else {
-                    var value = stdout.trim();
-                    callback(undefined, value);
-                }
-
-            })
-        },
-
-        /**
-         * Remove a variable from wf's env variables
-         * @param key variable name
-         * @param callback callback(err)
-         */
-        removeWfEnv: function(key, callback) {
-            var getCommand = utils.format('/usr/libexec/PlistBuddy -c "Delete :variables:%s" info.plist', key);
-            exec(getCommand, function(err, stdout, stderr) {
-                if (callback) {
-                    callback(_toUndefinedIfNull(err));
-                };
-            })
-        },
-
-        /**
-         * Use with caution!!!
-         * clear all workflow enviroment variables
-         * @param callback callback(err)
-         */
-        clearWfEnv: function(callback) {
-            var clearCommand = '/usr/libexec/PlistBuddy -c "Delete :variables" info.plist';
-            exec(clearCommand, function(err, stdout, stderr) {
-                if (callback) {
-                    callback(_toUndefinedIfNull(err))
-                };
-            })
         }
+
     };
 })();
 
