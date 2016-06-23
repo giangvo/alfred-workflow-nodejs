@@ -2,6 +2,7 @@ var exec = require('child_process').exec;
 var _ = require('underscore');
 var utils = require("util");
 // === WorkFlow ===
+
 var Workflow = (function() {
     var _items = [];
     var _name = "AlfredWfNodeJs";
@@ -46,20 +47,38 @@ var Workflow = (function() {
     };
 
     return {
+        /**
+         * Set workflow name
+         */
         setName: function(name) {
             _name = name;
         },
 
+        /**
+         * Get workflow name
+         */
         getName: function() {
             return _name;
         },
 
+        /**
+         * Add feedback item
+         */
         addItem: addItem,
 
+        /**
+         * Clear all feedback items
+         */
         clearItems: clearItems,
 
+        /**
+         * Generate feedbacks
+         */
         feedback: feedback,
 
+        /**
+         * Generate info fedback
+         */
         info: function(title, subtitle) {
             clearItems();
             addItem(new Item({
@@ -71,6 +90,9 @@ var Workflow = (function() {
             return feedback();
         },
 
+        /**
+         * Generate warning feedback
+         */
         warning: function(title, subtitle) {
             clearItems();
             addItem(new Item({
@@ -82,6 +104,9 @@ var Workflow = (function() {
             return feedback();
         },
 
+        /**
+         * Generate error feedback
+         */
         error: function(title, subtitle) {
             clearItems();
             addItem(new Item({
@@ -100,6 +125,9 @@ var ActionHandler = (function() {
     var events = require('events');
     var eventEmitter = new events.EventEmitter();
     return {
+        /**
+         * Register action handler
+         */
         onAction: function(action, handler) {
             if (!action || !handler) {
                 return;
@@ -107,6 +135,9 @@ var ActionHandler = (function() {
             eventEmitter.on("action-" + action, handler);
         },
 
+        /**
+         * Register menu item selected handler
+         */
         onMenuItemSelected: function(action, handler) {
             if (!action || !handler) {
                 return;
@@ -114,6 +145,9 @@ var ActionHandler = (function() {
             eventEmitter.on("menuItemSelected-" + action, handler);
         },
 
+        /**
+         * Handle action by delegate to registered action/menuItem handlers
+         */
         handle: function(action, query) {
             if (!query || query.indexOf(Utils.SUB_ACTION_SEPARATOR) === -1) {
                 // handle action
@@ -130,13 +164,16 @@ var ActionHandler = (function() {
             }
         },
 
+        /**
+         * Unregister all action handlers
+         */
         clear: function() {
             eventEmitter.removeAllListeners();
         }
     };
 })();
 
-// === Item ===
+// === Feedback Item ===
 function Item(data) {
     // ignore empty value
     data = _removeEmptyProperties(data);
@@ -146,6 +183,9 @@ function Item(data) {
     }
 }
 
+/**
+ * Generate feedback for a item
+ */
 Item.prototype.feedback = function() {
     this.arg = _updateArg(this.arg);
 
