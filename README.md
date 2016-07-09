@@ -81,8 +81,37 @@ workflow.setName("example-alfred-workflow-using-nodejs");
 
 ```js
 var Item = AlfredNode.Item;
-var item1 = new Item({title: "item 1", subtitle: "sub 1"});
-var item2 = new Item({uid: "uid", title: "item 1", subtitle: "sub 1", valid: true, icon: "icon.png", arg: "arg",  autocomplete: "autocomplete"});
+var item1 = new Item({
+    title: "item 1",
+    subtitle: "sub 1"
+});
+
+var item2 = new Item({
+    uid: "uid",
+    title: "item 1",
+    subtitle: "sub 1",
+    valid: true,
+    icon: "icon.png",
+    arg: "arg",
+    autocomplete: "autocomplete"
+});
+
+var item3 = new Item({
+    title: "item 3",
+    subtitle: "sub 3",
+    mods: {
+        cmd: {
+            valid: true,
+            arg: "cmd arg",
+            subtitle: "pressing cmd"
+        },
+        alt: {
+            valid: false,
+            arg: "alt arg",
+            subtitle: "pressing alt"
+        }
+    }
+});
 workflow.addItem(item1);
 workflow.addItem(item2);
 // generate feedbacks
