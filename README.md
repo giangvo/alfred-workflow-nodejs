@@ -1,9 +1,10 @@
 Alfred 3 Workflow Nodejs Library
 =========
-### (For Alfred 2 legaxy xml workflows, use version 1.1.1)
+#### (For Alfred 2 legaxy xml workflows, use version 1.1.1)
+
+[![Build Status](https://travis-ci.org/giangvo/alfred-workflow-nodejs.svg?branch=master)](https://travis-ci.org/giangvo/alfred-workflow-nodejs)
 
 ## Overview
-
 A small library providing helpers to create Alfred Workflow
 
 * Workflow & Item - Helper to build and generate feedbacks
