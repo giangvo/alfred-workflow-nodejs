@@ -1,5 +1,3 @@
 language: node_js
 node_js:
-  - "6"
-  - node
-  - iojs
+  - "6.2.2"
