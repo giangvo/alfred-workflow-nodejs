@@ -338,3 +338,4 @@ https://github.com/giangvo/alfred-workflow-nodejs
     * Add Utils.generateVars method to set variables
     * Add: Utils.envVars with set/get methods to set/get enviroment variables
     * Add: Utils.wfVars with set/get/remove/clear to set/get/remove/clear wf variables
+* 2.0.1: Use "node-persist" version 0.0.11 (latest version of "node-persist" is not compatible with this lib)

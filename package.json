@@ -1,6 +1,6 @@
 {
   "name": "alfred-workflow-nodejs",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Alfred workflow nodejs module",
   "author": "Giang Vo",
   "main": "alfredNode.js",
@@ -13,7 +13,7 @@
     "fuzzy": "*",
     "keychain": "0.0.4",
     "node-osascript": "^1.0.2",
-    "node-persist": "*",
+    "node-persist": "0.0.11",
     "request": "^2.51.0",
     "xmlbuilder": "*"
   },
