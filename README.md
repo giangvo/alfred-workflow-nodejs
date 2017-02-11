@@ -36,6 +36,7 @@ Workflow command
 /usr/local/bin/node main.js "action" "query"
 ```
 **main.js**
+
 ```js
 var AlfredNode = require('alfred-workflow-nodejs');
 var actionHandler = AlfredNode.actionHandler;
@@ -120,7 +121,14 @@ workflow.feedback();
 
 ```
 
+* Re-run the script after a given interval (0.1 to 5 seconds)
+
+```js
+workflow.feedback({ rerun: 3 });
+```
+
 * Generate info/warning/error message
+
 ```js
 workflow.info("title", "subtitle");
 workflow.warning("title", "subtitle");
@@ -130,12 +138,15 @@ workflow.error("title", "subtitle");
 
 ### Setting variables
 * Set variables via script output
+
 ```js
 AlfredNode.utils.generateVars({arg: 'xyz', variables: {key: value}};
 // output
 '{"alfredworkflow": {"arg": "xyz", "variables": {"key": "value"}}}'
 ```
+
 * Set variables via wf feedback item
+
 ```js
 var Item = AlfredNode.Item;
 var item = new Item({title: "item 1", arg: {arg: 'xyz', variables: {key: value}}});
@@ -152,10 +163,12 @@ workflow.feedback();
 ```
 
 ### Menu System
+
 - Get sub items by using `TAB` key when select a feeback
 - Set `hasSubItems` to true when create feeback item - require
 - Set data of item to use later to build sub items by using `data` - optional
 - Implement handler for menu item selected
+
 ```js
 /**
 * query: the query
@@ -163,14 +176,16 @@ workflow.feedback();
 * selectedItemData: data of selected item
 **/
 actionHandler.onMenuItemSelected("action", function(query, selectedItemTitle, selectedItemData){...})
+
 ```
 
---Scenario:
+####  Scenario:
 Open Alfred and type "menu" => 2 feedbacks are generated: "Feedback A" and "Feeback B" 
 => use arrow key to navigate to "Feedback B" and press `TAB`
 => Alfred search bar will now become "Feedback A $>" and display menu items of "Feedback A": "Item 1 of Feedback A" and "Item 2 of Feedback A"
 
---Code to handle "menuExample" action to generate feedback A and B
+#### Code to handle "menuExample" action to generate feedback A and B
+
 ```js
 actionHandler.onAction("menuExample", function(query) {
     var Item = AlfredNode.Item;
@@ -199,9 +214,11 @@ actionHandler.onAction("menuExample", function(query) {
     // generate feedbacks
     workflow.feedback();
 });
+
 ```
 
---Code to handle selection of "Feeback" by using `TAB`
+#### Code to handle selection of "Feeback" by using `TAB`
+
 ```js
 /**
 * query: the query
@@ -229,6 +246,7 @@ actionHandler.onMenuItemSelected("menuExample", function(query, title, data) {
     // generate feedbacks
     workflow.feedback();
 });
+
 ```
 
 Download example workflow and test with keyword `menuexample` for more info
@@ -320,8 +338,8 @@ Icons are from "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources
 ```js
 AlfredNode.ICONS.ERROR
 AlfredNode.ICONS.INFO
-
 ```
+
 (ACCOUNT, BURN, CLOCK, COLOR, EJECT, ERROR, FAVORITE, GROUP, HELP, HOME, INFO, NETWORK, NOTE, SETTINGS, SWIRL, SWITCH, SYNC, TRASH, USER, WARNING, WEB)
 
 ### Notes 
