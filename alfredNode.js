@@ -22,10 +22,10 @@ var Workflow = (function() {
         _items.push(item.feedback());
     };
 
-    var feedback = function() {
+    var feedback = function(args) {
+        args = args || {};
 
-        var usage = Storage.get("usage");
-        usage = usage || {};
+        var usage = Storage.get("usage") || {};
 
         _.each(_items, function(item) {
             var title = item.title;
@@ -38,12 +38,10 @@ var Workflow = (function() {
             delete item.count;
         });
 
-        var ret = JSON.stringify({
-            items: sortedItems
-        });
+        var output = JSON.stringify(Object.assign({}, args, { items: sortedItems }));
 
-        console.log(ret);
-        return ret;
+        console.log(output);
+        return output;
     };
 
     return {
@@ -354,7 +352,7 @@ var Utils = (function() {
 
         /**
          * @param data: {arg: 'xyz', variables: {key: value}}
-         * @return 
+         * @return
          *     string of '{"alfredworkflow": {"arg": "xyz", "variables": {"key": "value"}}}'
          *     or data if data is not type of object
          */

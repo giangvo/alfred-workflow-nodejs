@@ -138,6 +138,20 @@ suite("#WorkflowTest", function() {
         assert.isUndefined(storage.get("wfData"), "should not have wf data");
     });
 
+    test("generate feeback with rerun", function() {
+        var expectedObj = '{"rerun":5,"items":[{"valid":"NO","title":"title"}]}';
+        var item = new Item({
+            "title": "title"
+        });
+        workflow.addItem(item);
+
+        var ret = workflow.feedback({rerun: 5});
+
+        assert.strictEqual(ret, expectedObj);
+
+        assert.isUndefined(storage.get("wfData"), "should not have wf data");
+    });
+
     test("generate 2 feeback", function() {
         var expectedObj = '{"items":[{"uid":"1","valid":"YES","title":"title 1.1"},{"uid":"2","valid":"NO","title":"title 1.2"}]}'
         var item = new Item({
@@ -157,6 +171,32 @@ suite("#WorkflowTest", function() {
         workflow.addItem(item2);
 
         var ret = workflow.feedback();
+
+        assert.strictEqual(ret, expectedObj);
+
+        var wfData = storage.get("wfData");
+        assert.strictEqual(wfData["title 1.2"].count, 1);
+    });
+
+    test("generate 2 feeback with rerun", function() {
+        var expectedObj = '{"rerun":5,"items":[{"uid":"1","valid":"YES","title":"title 1.1"},{"uid":"2","valid":"NO","title":"title 1.2"}]}'
+        var item = new Item({
+            "title": "title 1.1",
+            "valid": true,
+            "uid": "1"
+        });
+        var item2 = new Item({
+            "title": "title 1.2",
+            "valid": false,
+            "uid": "2",
+            "data": {
+                count: 1
+            }
+        });
+        workflow.addItem(item);
+        workflow.addItem(item2);
+
+        var ret = workflow.feedback({rerun: 5});
 
         assert.strictEqual(ret, expectedObj);
 
