@@ -1,4 +1,4 @@
-var exec = require('child_process').exec;
+var execFile = require('child_process').execFile;
 var _ = require('underscore');
 var utils = require("util");
 // === WorkFlow ===
@@ -309,6 +309,7 @@ var Settings = (function() {
 var Utils = (function() {
     var fuzzy = require('fuzzy');
     var applescript = require('node-osascript');
+    const cmd ='/usr/libexec/PlistBuddy'
     return {
         SUB_ACTION_SEPARATOR: " $>",
 
@@ -398,12 +399,12 @@ var Utils = (function() {
             set: function(key, value, callback) {
                 if (key !== undefined && value !== undefined) {
                     // set variable to plist
-                    var setCommand = utils.format('/usr/libexec/PlistBuddy -c "Set :variables:%s \"%s\"" info.plist', key, value);
-                    exec(setCommand, function(err, stdout, stderr) {
+                    var setCommandArgs = ['-c', utils.format('Set :variables:%s \"%s\"', key, value), 'info.plist'];
+                    execFile(cmd, setCommandArgs, function(err, stdout, stderr) {
                         // if variable is not in plist => add it to plist
                         if (err) {
-                            var addCommand = utils.format('/usr/libexec/PlistBuddy -c "Add :variables:%s string \"%s\"" info.plist', key, value);
-                            exec(addCommand, function(err, stdout, stderr) {
+                            var addCommandArgs = ['-c', utils.format('Add :variables:%s string \"%s\"', key, value), 'info.plist'];
+                            execFile(cmd, addCommandArgs, function(err, stdout, stderr) {
                                 if (callback) {
                                     callback(_toUndefinedIfNull(err));
                                 };
@@ -423,8 +424,8 @@ var Utils = (function() {
              * @return wf variable
              */
             get: function(key, callback) {
-                var getCommand = utils.format('/usr/libexec/PlistBuddy -c "Print :variables:%s" info.plist', key);
-                exec(getCommand, function(err, stdout, stderr) {
+                var getCommandArgs = ['-c', utils.format('Print :variables:%s', key), 'info.plist'];
+                execFile(cmd, getCommandArgs, function(err, stdout, stderr) {
                     if (err) {
                         callback(err);
                     } else {
@@ -441,8 +442,8 @@ var Utils = (function() {
              * @param callback callback(err)
              */
             remove: function(key, callback) {
-                var getCommand = utils.format('/usr/libexec/PlistBuddy -c "Delete :variables:%s" info.plist', key);
-                exec(getCommand, function(err, stdout, stderr) {
+                var getCommandArgs = ['-c', utils.format('Delete :variables:%s', key), 'info.plist'];
+                execFile(cmd, getCommandArgs, function(err, stdout, stderr) {
                     if (callback) {
                         callback(_toUndefinedIfNull(err));
                     };
@@ -455,8 +456,8 @@ var Utils = (function() {
              * @param callback callback(err)
              */
             clear: function(callback) {
-                var clearCommand = '/usr/libexec/PlistBuddy -c "Delete :variables" info.plist';
-                exec(clearCommand, function(err, stdout, stderr) {
+                var clearCommandArgs = ['-c', 'Delete :variables', 'info.plist'];
+                execFile(cmd, clearCommandArgs, function(err, stdout, stderr) {
                     if (callback) {
                         callback(_toUndefinedIfNull(err))
                     };
