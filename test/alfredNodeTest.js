@@ -9,8 +9,8 @@ const storage = AlfredNode.storage;
 const Item = AlfredNode.Item;
 const Utils = AlfredNode.utils;
 
-suite("#ItemTest", function() {
-    test("test item 1", function() {
+describe("#ItemTest", function() {
+    it("test item 1", function() {
         const item = new Item({
             "title": "title"
         });
@@ -22,7 +22,7 @@ suite("#ItemTest", function() {
         assert.deepEqual(item.feedback(), expectedObj);
     });
 
-    test("test item 2", function() {
+    it("test item 2", function() {
         const item = new Item({
             "title": "title",
             "valid": true
@@ -36,12 +36,12 @@ suite("#ItemTest", function() {
     });
 });
 
-suite("#WorkflowTest", function() {
-    teardown(function() {
+describe("#WorkflowTest", function() {
+    afterEach(function() {
         workflow.clearItems();
     });
 
-    test("generate empty feeback", function() {
+    it("generate empty feeback", function() {
         const expectedObj = '{"items":[]}';
 
         const ret = workflow.feedback();
@@ -49,7 +49,7 @@ suite("#WorkflowTest", function() {
         assert.strictEqual(ret, expectedObj);
     });
 
-    test("generate 1 feeback", function() {
+    it("generate 1 feeback", function() {
         const expectedObj = '{"items":[{"valid":"NO","title":"title"}]}';
         const item = new Item({
             "title": "title"
@@ -63,7 +63,7 @@ suite("#WorkflowTest", function() {
         assert.isUndefined(storage.get("wfData"), "should not have wf data");
     });
 
-    test("generate feeback with data", function() {
+    it("generate feeback with data", function() {
         const expectedObj = '{"items":[{"valid":"NO","title":"title a"}]}';
         const item = new Item({
             "title": "title a",
@@ -82,7 +82,7 @@ suite("#WorkflowTest", function() {
 
     });
 
-    test("generate feeback with string arg", function() {
+    it("generate feeback with string arg", function() {
         const expectedObj = '{"items":[{"arg":"arg","valid":"NO","title":"title"}]}';
         const item = new Item({
             'title': 'title',
@@ -97,7 +97,7 @@ suite("#WorkflowTest", function() {
         assert.isUndefined(storage.get("wfData"), "should not have wf data");
     });
 
-    test("generate feeback with variables in arg", function() {
+    it("generate feeback with variables in arg", function() {
         const expectedObj = '{"items":[{"arg":"{\\"alfredworkflow\\":{\\"arg\\":\\"arg\\",\\"variables\\":{\\"key\\":\\"value\\"}}}","valid":"NO","title":"title"}]}';
         const item = new Item({
             'title': 'title',
@@ -122,7 +122,7 @@ suite("#WorkflowTest", function() {
         assert.isUndefined(storage.get("wfData"), "should not have wf data");
     });
 
-    test("generate feeback which has sub items", function() {
+    it("generate feeback which has sub items", function() {
         const expectedObj = '{"items":[{"valid":"NO","autocomplete":"item has subItems' + Utils.SUB_ACTION_SEPARATOR + '","title":"item has subItems"}]}'
         const item = new Item({
             "title": "item has subItems",
@@ -138,7 +138,7 @@ suite("#WorkflowTest", function() {
         assert.isUndefined(storage.get("wfData"), "should not have wf data");
     });
 
-    test("generate 2 feeback", function() {
+    it("generate 2 feeback", function() {
         const expectedObj = '{"items":[{"uid":"1","valid":"YES","title":"title 1.1"},{"uid":"2","valid":"NO","title":"title 1.2"}]}'
         const item = new Item({
             "title": "title 1.1",
@@ -164,7 +164,7 @@ suite("#WorkflowTest", function() {
         assert.strictEqual(wfData["title 1.2"].count, 1);
     });
 
-    test("clear items", function() {
+    it("clear items", function() {
         const expectedObj = '{"items":[]}'
         const item = new Item({
             "title": "title"
@@ -179,14 +179,14 @@ suite("#WorkflowTest", function() {
         assert.isUndefined(storage.get("wfData"), "should not have wf data");
     });
 
-    test("generate error feeback", function() {
+    it("generate error feeback", function() {
         const expectedObj = '{"items":[{"valid":"NO","title":"wf error","icon":{"path":"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertStopIcon.icns"}}]}'
         const ret = workflow.error("wf error");
 
         assert.strictEqual(ret, expectedObj);
     });
 
-    test("generate error feeback with 1 added item", function() {
+    it("generate error feeback with 1 added item", function() {
         const expectedObj = '{"items":[{"valid":"NO","title":"wf error","icon":{"path":"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertStopIcon.icns"}}]}'
 
         const item = new Item({
@@ -199,7 +199,7 @@ suite("#WorkflowTest", function() {
         assert.strictEqual(ret, expectedObj);
     });
 
-    test("generate warning feeback", function() {
+    it("generate warning feeback", function() {
         const expectedObj = '{"items":[{"valid":"NO","title":"wf warning","icon":{"path":"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionBadgeIcon.icns"}}]}'
 
         const ret = workflow.warning("wf warning");
@@ -207,7 +207,7 @@ suite("#WorkflowTest", function() {
         assert.strictEqual(ret, expectedObj);
     });
 
-    test("generate warning feeback with 1 added item", function() {
+    it("generate warning feeback with 1 added item", function() {
         const expectedObj = '{"items":[{"valid":"NO","title":"wf warning","icon":{"path":"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionBadgeIcon.icns"}}]}'
 
         const item = new Item({
@@ -220,7 +220,7 @@ suite("#WorkflowTest", function() {
         assert.strictEqual(ret, expectedObj);
     });
 
-    test("generate info feeback", function() {
+    it("generate info feeback", function() {
         const expectedObj = '{"items":[{"valid":"NO","title":"wf info","icon":{"path":"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns"}}]}'
 
         const ret = workflow.info("wf info");
@@ -228,7 +228,7 @@ suite("#WorkflowTest", function() {
         assert.strictEqual(ret, expectedObj);
     })
 
-    test("generate info feeback with 1 added item", function() {
+    it("generate info feeback with 1 added item", function() {
         const expectedObj = '{"items":[{"valid":"NO","title":"wf info","icon":{"path":"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns"}}]}'
 
         const item = new Item({
@@ -242,14 +242,14 @@ suite("#WorkflowTest", function() {
     });
 });
 
-suite("#ActionHandlerTest", function() {
+describe("#ActionHandlerTest", function() {
     const actionHandler = AlfredNode.actionHandler;
-    teardown(function() {
+    afterEach(function() {
         actionHandler.clear();
     });
 
 
-    test("test action handler", function() {
+    it("test action handler", function() {
         let data = "";
         actionHandler.onAction("action", function(query) {
             data = query;
@@ -261,7 +261,7 @@ suite("#ActionHandlerTest", function() {
 
     });
 
-    test("test action handler for empty query", function() {
+    it("test action handler for empty query", function() {
         let data = "";
         actionHandler.onAction("action", function(query) {
             data = query;
@@ -274,7 +274,7 @@ suite("#ActionHandlerTest", function() {
     });
 
 
-    test("test action handler is not call for different action", function() {
+    it("test action handler is not call for different action", function() {
         let data = "";
         actionHandler.onAction("action", function(query) {
             data = query;
@@ -286,7 +286,7 @@ suite("#ActionHandlerTest", function() {
 
     });
 
-    test("test sub action handler", function() {
+    it("test sub action handler", function() {
         let data1 = "";
         let data2 = "";
         actionHandler.onMenuItemSelected("action", function(query, selectedItemTitle, selectedItemData) {
@@ -301,7 +301,7 @@ suite("#ActionHandlerTest", function() {
         assert.isUndefined(data3);
     });
 
-    test("test sub action handler with empty query", function() {
+    it("test sub action handler with empty query", function() {
         let data1 = "";
         let data2 = "";
         actionHandler.onMenuItemSelected("action", function(query, selectedItem, selectedItemData) {
@@ -314,7 +314,7 @@ suite("#ActionHandlerTest", function() {
         assert.strictEqual(data2, "");
     });
 
-    test("test action and sub action handler", function() {
+    it("test action and sub action handler", function() {
         let data0 = "";
         let data1 = "";
         let data2 = "";
@@ -337,12 +337,12 @@ suite("#ActionHandlerTest", function() {
     });
 });
 
-suite("#StorageTest", function() {
-    teardown(function() {
+describe("#StorageTest", function() {
+    afterEach(function() {
         storage.clear();
     });
 
-    test("test set and get item without ttl", function() {
+    it("test set and get item without ttl", function() {
         const obj = {
             text: "abc"
         };
@@ -352,7 +352,7 @@ suite("#StorageTest", function() {
         obj.should.equal(obj2);
     });
 
-    test("test set and get item with ttl is not expired", function(done) {
+    it("test set and get item with ttl is not expired", function(done) {
         const obj = {
             text: "abc"
         };
@@ -365,7 +365,7 @@ suite("#StorageTest", function() {
         }, 500);
     });
 
-    test("test set and get item with ttl is expired", function(done) {
+    it("test set and get item with ttl is expired", function(done) {
         const obj = {
             text: "abc"
         };
@@ -378,7 +378,7 @@ suite("#StorageTest", function() {
         }, 1100);
     });
 
-    test("test set and get multiple items", function() {
+    it("test set and get multiple items", function() {
         const obj1 = {
             text: "abc"
         };
@@ -394,7 +394,7 @@ suite("#StorageTest", function() {
         obj2.should.equal(storage.get("key2"));
     });
 
-    test("test remove item", function() {
+    it("test remove item", function() {
         const obj = {
             text: "abc"
         };
@@ -406,7 +406,7 @@ suite("#StorageTest", function() {
         should.not.exist(obj2);
     });
 
-    test("test clear item", function() {
+    it("test clear item", function() {
         const obj = {
             text: "abc"
         };
@@ -420,21 +420,21 @@ suite("#StorageTest", function() {
 });
 
 
-suite("#Settings test", function() {
+describe("#Settings test", function() {
     const Settings = AlfredNode.settings;
 
-    teardown(function() {
+    afterEach(function() {
         Settings.clear();
     });
 
-    test("test set + get setting", function() {
+    it("test set + get setting", function() {
         Settings.set("username", "user1");
 
         const username = Settings.get("username");
         assert.strictEqual(username, "user1");
     });
 
-    test("test set + get multiple settings", function() {
+    it("test set + get multiple settings", function() {
         Settings.set("username", "user1");
         Settings.set("password", "pass1");
 
@@ -442,19 +442,19 @@ suite("#Settings test", function() {
         assert.strictEqual("pass1", Settings.get("password"));
     });
 
-    test("test remove setting", function() {
+    it("test remove setting", function() {
         Settings.set("username", "user1");
         Settings.remove("username");
         assert.isUndefined(Settings.get("username"));
     });
 
-    test("test clear setting", function() {
+    it("test clear setting", function() {
         Settings.set("username", "user1");
         Settings.clear();
         assert.isUndefined(Settings.get("username"));
     });
 
-    /*test("test set password", function(done) {
+    /*it("test set password", function(done) {
         Settings.setPassword("user1", "mypass");
         Settings.getPassword("user1", function(error, password) {
             assert.strictEqual(password, "mypass");
@@ -463,8 +463,8 @@ suite("#Settings test", function() {
     });*/
 });
 
-suite("#Utils test", function() {
-    test("test filter 1", function() {
+describe("#Utils test", function() {
+    it("test filter 1", function() {
         const list = [{
             key: "1",
             name: "This is a pencil"
@@ -489,7 +489,7 @@ suite("#Utils test", function() {
         assert.strictEqual(results.length, 0);
     });
 
-    test("test generate variables", function() {
+    it("test generate variables", function() {
         const data = {
             arg: 'xyz',
             variables: {
@@ -501,7 +501,7 @@ suite("#Utils test", function() {
         assert.strictEqual(ret, '{"alfredworkflow":{"arg":"xyz","variables":{"key":"value"}}}');
     });
 
-    test("test generate variables with empty variables", function() {
+    it("test generate variables with empty variables", function() {
         const data = {
             arg: 'xyz'
         }
@@ -510,7 +510,7 @@ suite("#Utils test", function() {
         assert.strictEqual(ret, '{"alfredworkflow":{"arg":"xyz"}}');
     });
 
-    test("test generate variables with empty arg", function() {
+    it("test generate variables with empty arg", function() {
         const data = {
             variables: {
                 key: 'value'
@@ -521,27 +521,27 @@ suite("#Utils test", function() {
         assert.strictEqual(ret, '{"alfredworkflow":{"variables":{"key":"value"}}}');
     });
 
-    test("test generate variables with input is string (not object)", function() {
+    it("test generate variables with input is string (not object)", function() {
         const data = 'string arg';
 
         const ret = Utils.generateVars(data);
         assert.strictEqual(ret, 'string arg');
     });
 
-    test("test generate variables with input is undefined", function() {
+    it("test generate variables with input is undefined", function() {
         const data = undefined;
 
         const ret = Utils.generateVars(data);
         assert.isUndefined(ret);
     });
 
-    test("test get/set env", function() {
+    it("test get/set env", function() {
 
         Utils.envVars.set('key', 'value');
         assert.strictEqual(Utils.envVars.get('key'), 'value');
     });
 
-    test("test get/set env for obj", function() {
+    it("test get/set env for obj", function() {
 
         Utils.envVars.set('key', {
             name: 'alex'
@@ -549,7 +549,7 @@ suite("#Utils test", function() {
         assert.strictEqual(Utils.envVars.get('key').name, 'alex');
     });
 
-    test("test get/set workflow var", function(done) {
+    it("test get/set workflow var", function(done) {
         const wfVars = Utils.wfVars;
         let ret;
         wfVars.clear(function(error) {
@@ -568,11 +568,11 @@ suite("#Utils test", function() {
     });
 });
 
-suite("Icons tests", function() {
+describe("Icons tests", function() {
     const ICONS = AlfredNode.ICONS;
     const fs = require("fs");
 
-    test("Check icons exist", function() {
+    it("Check icons exist", function() {
         assert.isTrue(fs.existsSync(ICONS.ACCOUNT));
         assert.isTrue(fs.existsSync(ICONS.BURN));
         assert.isTrue(fs.existsSync(ICONS.CLOCK));

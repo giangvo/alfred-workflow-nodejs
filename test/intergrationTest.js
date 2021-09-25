@@ -8,12 +8,12 @@ const utils = AlfredNode.utils;
 const Item = AlfredNode.Item;
 const storage = AlfredNode.storage;
 
-suite("#Integration test", function() {
+describe("#Integration test", function() {
     const actionHandler = AlfredNode.actionHandler;
 
-    teardown(function() {
+    afterEach(function() {
         actionHandler.clear();
-        workflow.clearItems();
+        wf.clearItems();
         process.argv = [];
     });
 

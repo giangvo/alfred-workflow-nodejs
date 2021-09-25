@@ -1,6 +1,6 @@
 {
   "name": "alfred-workflow-nodejs",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Alfred workflow nodejs module",
   "author": "Giang Vo",
   "main": "alfredNode.js",
@@ -9,22 +9,19 @@
     "url": "https://github.com/giangvo/alfred-workflow-nodejs"
   },
   "dependencies": {
-    "underscore": "^1.7.0",
+    "underscore": "^1.13.1",
     "fuzzy": "*",
-    "keychain": "0.0.4",
-    "node-osascript": "^1.0.2",
-    "node-persist": "0.0.11",
-    "request": "^2.51.0",
-    "xmlbuilder": "*"
+    "keychain": "^1.3.0",
+    "node-osascript": "^2.1.0",
+    "node-persist": "0.0.11"
   },
   "devDependencies": {
-    "chai": "^1.10.0",
-    "mocha": "^2.1.0",
-    "sinon": "^1.12.2",
-    "fs": "0.0.2"
+    "chai": "^4.3.4",
+    "mocha": "^9.1.2",
+    "sinon": "^11.1.2"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --ui tdd"
+    "test": "./node_modules/.bin/mocha --reporter spec"
   },
   "keywords": [
     "alfred",
