@@ -1,6 +1,6 @@
 {
   "name": "alfred-workflow-nodejs",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Alfred workflow nodejs module",
   "author": "Giang Vo",
   "main": "alfredNode.js",
