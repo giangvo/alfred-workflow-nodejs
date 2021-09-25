@@ -1,4 +1,4 @@
-Alfred 3 Workflow Nodejs Library
+Alfred Workflow Nodejs Library
 =========
 #### (For Alfred 2 legaxy xml workflows, use version 1.1.1)
 

@@ -1,15 +1,15 @@
-var _ = require('underscore');
-var Chai = require("chai");
-var assert = Chai.assert;
+const _ = require('underscore');
+const Chai = require("chai");
+const assert = Chai.assert;
 
-var AlfredNode = require("../alfredNode.js");
-var wf = AlfredNode.workflow;
-var utils = AlfredNode.utils;
-var Item = AlfredNode.Item;
-var storage = AlfredNode.storage;
+const AlfredNode = require("../alfredNode.js");
+const wf = AlfredNode.workflow;
+const utils = AlfredNode.utils;
+const Item = AlfredNode.Item;
+const storage = AlfredNode.storage;
 
 suite("#Integration test", function() {
-    var actionHandler = AlfredNode.actionHandler;
+    const actionHandler = AlfredNode.actionHandler;
 
     teardown(function() {
         actionHandler.clear();
@@ -17,7 +17,7 @@ suite("#Integration test", function() {
         process.argv = [];
     });
 
-    var _getData = function() {
+    const _getData = function() {
         return [{
             name: "Alex",
             age: "20"
@@ -30,7 +30,7 @@ suite("#Integration test", function() {
         }];
     };
 
-    var search = function(query) {
+    const search = function(query) {
         _.each(utils.filter(query, _getData(), function(data) {
             return data.name;
         }), function(item) {
@@ -47,8 +47,8 @@ suite("#Integration test", function() {
 
     it("interation test", function() {
         (function main() {
-            var feedback = "";
-            var data;
+            let feedback = "";
+            let data;
             actionHandler.onAction("action", function(query) {
                 feedback = search(query);
             });
@@ -95,17 +95,17 @@ suite("#Integration test", function() {
             storage.clear();
             process.argv = ["", "", "action", "Alex" + AlfredNode.utils.SUB_ACTION_SEPARATOR + ""];
             AlfredNode.run();
-            var usage = storage.get("usage");
+            let usage = storage.get("usage");
             assert.strictEqual(1, usage['Alex']); // usage should be tracked
 
             process.argv = ["", "", "action", "Alex" + AlfredNode.utils.SUB_ACTION_SEPARATOR + ""];
             AlfredNode.run();
-            var usage = storage.get("usage");
+            usage = storage.get("usage");
             assert.strictEqual(2, usage['Alex']); // usage should be increased
 
             process.argv = ["", "", "action", "Alex" + AlfredNode.utils.SUB_ACTION_SEPARATOR + "abc"];
             AlfredNode.run();
-            var usage = storage.get("usage");
+            usage = storage.get("usage");
             assert.strictEqual(2, usage['Alex']); // usage should NOT be increased when `query` is not empty
             wf.clearItems();
             storage.clear();

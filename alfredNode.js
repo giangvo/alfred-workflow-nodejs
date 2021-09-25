@@ -1,18 +1,18 @@
-var exec = require('child_process').exec;
-var _ = require('underscore');
-var utils = require("util");
+const exec = require('child_process').exec;
+const _ = require('underscore');
+const utils = require("util");
 // === WorkFlow ===
 
-var Workflow = (function() {
-    var _items = [];
-    var _name = "AlfredWfNodeJs";
-    var handlers = {};
-    var clearItems = function() {
+const Workflow = (function() {
+    let _items = [];
+    const _name = "AlfredWfNodeJs";
+    const handlers = {};
+    const clearItems = function() {
         _items = [];
         clearItemsData();
     };
 
-    var addItem = function(item) {
+    const addItem = function(item) {
         saveItemData(item);
 
         if (item.hasSubItems) {
@@ -22,23 +22,22 @@ var Workflow = (function() {
         _items.push(item.feedback());
     };
 
-    var feedback = function() {
+    const feedback = function() {
 
-        var usage = Storage.get("usage");
-        usage = usage || {};
+        const usage = Storage.get("usage") || {};
 
         _.each(_items, function(item) {
-            var title = item.title;
+            const title = item.title;
             item.count = usage[title] ? (0 - usage[title]) : 0;
         });
 
-        var sortedItems = _.sortBy(_items, "count");
+        const sortedItems = _.sortBy(_items, "count");
 
         _.each(sortedItems, function(item) {
             delete item.count;
         });
 
-        var ret = JSON.stringify({
+        const ret = JSON.stringify({
             items: sortedItems
         });
 
@@ -121,9 +120,9 @@ var Workflow = (function() {
 })();
 
 // === Action Handler ===
-var ActionHandler = (function() {
-    var events = require('events');
-    var eventEmitter = new events.EventEmitter();
+const ActionHandler = (function() {
+    const events = require('events');
+    const eventEmitter = new events.EventEmitter();
     return {
         /**
          * Register action handler
@@ -154,8 +153,8 @@ var ActionHandler = (function() {
                 eventEmitter.emit("action-" + action, query);
             } else {
                 // handle sub action
-                var tmp = query.split(Utils.SUB_ACTION_SEPARATOR);
-                var selectedItemTitle = tmp[0].trim();
+                const tmp = query.split(Utils.SUB_ACTION_SEPARATOR);
+                const selectedItemTitle = tmp[0].trim();
                 query = tmp[1].trim();
 
                 saveUsage(query, selectedItemTitle);
@@ -178,7 +177,7 @@ function Item(data) {
     // ignore empty value
     data = _removeEmptyProperties(data);
 
-    for (var key in data) {
+    for (const key in data) {
         this[key] = data[key];
     }
 }
@@ -189,7 +188,7 @@ function Item(data) {
 Item.prototype.feedback = function() {
     this.arg = _updateArg(this.arg);
 
-    var item = _removeEmptyProperties({
+    const item = _removeEmptyProperties({
         "uid": this.uid,
         "arg": this.arg,
         "valid": this.valid === true ? "YES" : "NO",
@@ -209,13 +208,13 @@ Item.prototype.feedback = function() {
 };
 
 // === Storage
-var Storage = (function() {
-    var storage = require('node-persist');
+const Storage = (function() {
+    const storage = require('node-persist');
     storage.initSync();
 
     return {
         set: function(key, value, ttl) {
-            var obj = {
+            const obj = {
                 data: value,
                 timestamp: new Date().getTime(),
                 ttl: ttl || -1
@@ -225,16 +224,16 @@ var Storage = (function() {
         },
 
         get: function(key) {
-            var obj = storage.getItemSync(key);
+            const obj = storage.getItemSync(key);
             if (obj) {
-                var ttl = obj.ttl;
-                var timestamp = obj.timestamp;
+                const ttl = obj.ttl;
+                const timestamp = obj.timestamp;
                 // if not ttl => return obj
                 if (ttl === -1) {
                     return obj.data;
                 } else {
                     // check ttl
-                    var now = new Date().getTime();
+                    const now = new Date().getTime();
                     if (now - timestamp < ttl) {
                         return obj.data;
                     } else {
@@ -257,26 +256,25 @@ var Storage = (function() {
 })();
 
 // === Settings
-var Settings = (function() {
-    var keychain = require('keychain');
+const Settings = (function() {
+    const keychain = require('keychain');
 
     return {
         set: function(key, value) {
-            var settings = Storage.get("settings");
-            settings = settings || {};
+            const settings = Storage.get("settings") || {};
             settings[key] = value;
             Storage.set("settings", settings);
         },
 
         get: function(key) {
-            var settings = Storage.get("settings");
+            const settings = Storage.get("settings");
             if (settings) {
                 return settings[key];
             }
         },
 
         remove: function(key) {
-            var settings = Storage.get("settings");
+            const settings = Storage.get("settings");
             if (settings) {
                 delete settings[key];
             }
@@ -306,9 +304,9 @@ var Settings = (function() {
 })();
 
 // === Utils
-var Utils = (function() {
-    var fuzzy = require('fuzzy');
-    var applescript = require('node-osascript');
+const Utils = (function() {
+    const fuzzy = require('fuzzy');
+    const applescript = require('node-osascript');
     return {
         SUB_ACTION_SEPARATOR: " $>",
 
@@ -317,7 +315,7 @@ var Utils = (function() {
                 return list;
             }
 
-            var options = {
+            const options = {
                 extract: keyBuilder
             };
 
@@ -359,7 +357,7 @@ var Utils = (function() {
          *     or data if data is not type of object
          */
         generateVars: function(data) {
-            var ret = _updateArg(data);
+            const ret = _updateArg(data);
             console.log(ret);
             return ret;
         },
@@ -398,11 +396,11 @@ var Utils = (function() {
             set: function(key, value, callback) {
                 if (key !== undefined && value !== undefined) {
                     // set variable to plist
-                    var setCommand = utils.format('/usr/libexec/PlistBuddy -c "Set :variables:%s \"%s\"" info.plist', key, value);
+                    const setCommand = utils.format('/usr/libexec/PlistBuddy -c "Set :variables:%s \"%s\"" info.plist', key, value);
                     exec(setCommand, function(err, stdout, stderr) {
                         // if variable is not in plist => add it to plist
                         if (err) {
-                            var addCommand = utils.format('/usr/libexec/PlistBuddy -c "Add :variables:%s string \"%s\"" info.plist', key, value);
+                            const addCommand = utils.format('/usr/libexec/PlistBuddy -c "Add :variables:%s string \"%s\"" info.plist', key, value);
                             exec(addCommand, function(err, stdout, stderr) {
                                 if (callback) {
                                     callback(_toUndefinedIfNull(err));
@@ -423,12 +421,12 @@ var Utils = (function() {
              * @return wf variable
              */
             get: function(key, callback) {
-                var getCommand = utils.format('/usr/libexec/PlistBuddy -c "Print :variables:%s" info.plist', key);
+                const getCommand = utils.format('/usr/libexec/PlistBuddy -c "Print :variables:%s" info.plist', key);
                 exec(getCommand, function(err, stdout, stderr) {
                     if (err) {
                         callback(err);
                     } else {
-                        var value = stdout.trim();
+                        const value = stdout.trim();
                         callback(undefined, value);
                     }
 
@@ -441,7 +439,7 @@ var Utils = (function() {
              * @param callback callback(err)
              */
             remove: function(key, callback) {
-                var getCommand = utils.format('/usr/libexec/PlistBuddy -c "Delete :variables:%s" info.plist', key);
+                const getCommand = utils.format('/usr/libexec/PlistBuddy -c "Delete :variables:%s" info.plist', key);
                 exec(getCommand, function(err, stdout, stderr) {
                     if (callback) {
                         callback(_toUndefinedIfNull(err));
@@ -455,7 +453,7 @@ var Utils = (function() {
              * @param callback callback(err)
              */
             clear: function(callback) {
-                var clearCommand = '/usr/libexec/PlistBuddy -c "Delete :variables" info.plist';
+                const clearCommand = '/usr/libexec/PlistBuddy -c "Delete :variables" info.plist';
                 exec(clearCommand, function(err, stdout, stderr) {
                     if (callback) {
                         callback(_toUndefinedIfNull(err))
@@ -467,9 +465,9 @@ var Utils = (function() {
     };
 })();
 
-var ICONS = (function() {
+const ICONS = (function() {
     // mac icons root folder
-    var ICON_ROOT = "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/";
+    const ICON_ROOT = "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/";
 
     return {
         ACCOUNT: ICON_ROOT + "Accounts.icns",
@@ -491,15 +489,15 @@ var ICONS = (function() {
         SYNC: ICON_ROOT + "Sync.icns",
         TRASH: ICON_ROOT + "TrashIcon.icns",
         USER: ICON_ROOT + "UserIcon.icns",
-        WARNING: ICON_ROOT + "AlertCautionIcon.icns",
+        WARNING: ICON_ROOT + "AlertCautionBadgeIcon.icns",
         WEB: ICON_ROOT + "BookmarkIcon.icns",
     };
 })();
 
 // === private functions
 function _removeEmptyProperties(data) {
-    for (var key in data) {
-        var value = data[key];
+    for (const key in data) {
+        let value = data[key];
         if (typeof value === 'object') {
             value = _removeEmptyProperties(value);
             if (!Object.keys(value).length) {
@@ -517,8 +515,7 @@ function _removeEmptyProperties(data) {
 // save item data into storage as "item title" => item data
 function saveItemData(item) {
     if (item.data) {
-        var wfData = Storage.get("wfData");
-        wfData = wfData || {};
+        const wfData = Storage.get("wfData") || {};
         wfData[item.title] = item.data;
         Storage.set("wfData", wfData);
     }
@@ -530,17 +527,15 @@ function clearItemsData(item) {
 
 function getItemData(itemTitle) {
     itemTitle = typeof itemTitle === "string" ? itemTitle.normalize() : itemTitle;
-    var wfData = Storage.get("wfData");
+    const wfData = Storage.get("wfData");
     return wfData ? wfData[itemTitle] : undefined;
 }
 
 function saveUsage(query, itemTitle) {
     if (!query) {
-        var usage = Storage.get("usage");
-        usage = usage || {};
+        const usage = Storage.get("usage") || {};
 
-        var count = usage[itemTitle];
-        count = count || 0;
+        const count = usage[itemTitle] || 0;
         usage[itemTitle] = count + 1;
 
         Storage.set("usage", usage);
@@ -549,8 +544,8 @@ function saveUsage(query, itemTitle) {
 
 function _updateArg(data) {
     if (typeof data === "object") {
-        var _arg = data.arg;
-        var _variables = data.variables;
+        const _arg = data.arg;
+        const _variables = data.variables;
         return JSON.stringify({
             alfredworkflow: {
                 arg: _arg,
@@ -590,8 +585,8 @@ module.exports = {
     utils: Utils,
     ICONS: ICONS,
     run: function() {
-        var action = process.argv[2];
-        var query = process.argv[3];
+        const action = process.argv[2];
+        const query = process.argv[3];
         ActionHandler.handle(action, query);
     }
 };
