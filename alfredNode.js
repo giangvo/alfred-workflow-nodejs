@@ -1,12 +1,17 @@
-const exec = require('child_process').exec;
+const { exec } = require('child_process');
 const _ = require('underscore');
-const utils = require("util");
+const utils = require('util');
+const events = require('events');
+const storage = require('node-persist');
+const keychain = require('keychain');
+const fuzzy = require('fuzzy');
+const applescript = require('node-osascript');
+
 // === WorkFlow ===
 
 const Workflow = (function() {
     let _items = [];
-    const _name = "AlfredWfNodeJs";
-    const handlers = {};
+    let _name = 'AlfredWfNodeJs';
     const clearItems = function() {
         _items = [];
         clearItemsData();
@@ -23,22 +28,21 @@ const Workflow = (function() {
     };
 
     const feedback = function() {
+        const usage = Storage.get('usage') || {};
 
-        const usage = Storage.get("usage") || {};
-
-        _.each(_items, function(item) {
-            const title = item.title;
+        _.each(_items, (item) => {
+            const { title } = item;
             item.count = usage[title] ? (0 - usage[title]) : 0;
         });
 
-        const sortedItems = _.sortBy(_items, "count");
+        const sortedItems = _.sortBy(_items, 'count');
 
-        _.each(sortedItems, function(item) {
+        _.each(sortedItems, (item) => {
             delete item.count;
         });
 
         const ret = JSON.stringify({
-            items: sortedItems
+            items: sortedItems,
         });
 
         console.log(ret);
@@ -49,41 +53,41 @@ const Workflow = (function() {
         /**
          * Set workflow name
          */
-        setName: function(name) {
+        setName(name) {
             _name = name;
         },
 
         /**
          * Get workflow name
          */
-        getName: function() {
+        getName() {
             return _name;
         },
 
         /**
          * Add feedback item
          */
-        addItem: addItem,
+        addItem,
 
         /**
          * Clear all feedback items
          */
-        clearItems: clearItems,
+        clearItems,
 
         /**
          * Generate feedbacks
          */
-        feedback: feedback,
+        feedback,
 
         /**
          * Generate info fedback
          */
-        info: function(title, subtitle) {
+        info(title, subtitle) {
             clearItems();
             addItem(new Item({
-                title: title,
-                subtitle: subtitle,
-                icon: ICONS.INFO
+                title,
+                subtitle,
+                icon: ICONS.INFO,
             }));
 
             return feedback();
@@ -92,12 +96,12 @@ const Workflow = (function() {
         /**
          * Generate warning feedback
          */
-        warning: function(title, subtitle) {
+        warning(title, subtitle) {
             clearItems();
             addItem(new Item({
-                title: title,
-                subtitle: subtitle,
-                icon: ICONS.WARNING
+                title,
+                subtitle,
+                icon: ICONS.WARNING,
             }));
 
             return feedback();
@@ -106,51 +110,50 @@ const Workflow = (function() {
         /**
          * Generate error feedback
          */
-        error: function(title, subtitle) {
+        error(title, subtitle) {
             clearItems();
             addItem(new Item({
-                title: title,
-                subtitle: subtitle,
-                icon: ICONS.ERROR
+                title,
+                subtitle,
+                icon: ICONS.ERROR,
             }));
 
             return feedback();
-        }
+        },
     };
-})();
+}());
 
 // === Action Handler ===
 const ActionHandler = (function() {
-    const events = require('events');
     const eventEmitter = new events.EventEmitter();
     return {
         /**
          * Register action handler
          */
-        onAction: function(action, handler) {
+        onAction(action, handler) {
             if (!action || !handler) {
                 return;
             }
-            eventEmitter.on("action-" + action, handler);
+            eventEmitter.on(`action-${action}`, handler);
         },
 
         /**
          * Register menu item selected handler
          */
-        onMenuItemSelected: function(action, handler) {
+        onMenuItemSelected(action, handler) {
             if (!action || !handler) {
                 return;
             }
-            eventEmitter.on("menuItemSelected-" + action, handler);
+            eventEmitter.on(`menuItemSelected-${action}`, handler);
         },
 
         /**
          * Handle action by delegate to registered action/menuItem handlers
          */
-        handle: function(action, query) {
+        handle(action, query) {
             if (!query || query.indexOf(Utils.SUB_ACTION_SEPARATOR) === -1) {
                 // handle action
-                eventEmitter.emit("action-" + action, query);
+                eventEmitter.emit(`action-${action}`, query);
             } else {
                 // handle sub action
                 const tmp = query.split(Utils.SUB_ACTION_SEPARATOR);
@@ -159,18 +162,18 @@ const ActionHandler = (function() {
 
                 saveUsage(query, selectedItemTitle);
 
-                eventEmitter.emit("menuItemSelected-" + action, query, selectedItemTitle, getItemData(selectedItemTitle));
+                eventEmitter.emit(`menuItemSelected-${action}`, query, selectedItemTitle, getItemData(selectedItemTitle));
             }
         },
 
         /**
          * Unregister all action handlers
          */
-        clear: function() {
+        clear() {
             eventEmitter.removeAllListeners();
-        }
+        },
     };
-})();
+}());
 
 // === Feedback Item ===
 function Item(data) {
@@ -189,19 +192,19 @@ Item.prototype.feedback = function() {
     this.arg = _updateArg(this.arg);
 
     const item = _removeEmptyProperties({
-        "uid": this.uid,
-        "arg": this.arg,
-        "valid": this.valid === true ? "YES" : "NO",
-        "autocomplete": this.autocomplete,
-        "title": this.title,
-        "subtitle": this.subtitle,
-        "type": this.type,
-        "icon": {
-            "path": this.icon
+        uid: this.uid,
+        arg: this.arg,
+        valid: this.valid === true ? 'YES' : 'NO',
+        autocomplete: this.autocomplete,
+        title: this.title,
+        subtitle: this.subtitle,
+        type: this.type,
+        icon: {
+            path: this.icon,
         },
-        "quicklookurl": this.quicklookurl,
-        "text": this.text,
-        "mods": this.mods
+        quicklookurl: this.quicklookurl,
+        text: this.text,
+        mods: this.mods,
     });
 
     return item;
@@ -209,119 +212,112 @@ Item.prototype.feedback = function() {
 
 // === Storage
 const Storage = (function() {
-    const storage = require('node-persist');
     storage.initSync();
 
     return {
-        set: function(key, value, ttl) {
+        set(key, value, ttl) {
             const obj = {
                 data: value,
                 timestamp: new Date().getTime(),
-                ttl: ttl || -1
+                ttl: ttl || -1,
             };
 
             storage.setItemSync(key, obj);
         },
 
-        get: function(key) {
+        get(key) {
             const obj = storage.getItemSync(key);
             if (obj) {
-                const ttl = obj.ttl;
-                const timestamp = obj.timestamp;
+                const { ttl } = obj;
+                const { timestamp } = obj;
                 // if not ttl => return obj
                 if (ttl === -1) {
                     return obj.data;
-                } else {
-                    // check ttl
-                    const now = new Date().getTime();
-                    if (now - timestamp < ttl) {
-                        return obj.data;
-                    } else {
-                        storage.removeItemSync(key, function() {});
-                    }
                 }
+                // check ttl
+                const now = new Date().getTime();
+                if (now - timestamp < ttl) {
+                    return obj.data;
+                }
+                storage.removeItemSync(key, () => {});
             }
+            return undefined;
         },
 
-        remove: function(key) {
+        remove(key) {
             if (storage.getItem(key)) {
-                storage.removeItemSync(key, function() {});
+                storage.removeItemSync(key, () => {});
             }
         },
 
-        clear: function() {
+        clear() {
             storage.clearSync();
-        }
+        },
     };
-})();
+}());
 
 // === Settings
 const Settings = (function() {
-    const keychain = require('keychain');
-
     return {
-        set: function(key, value) {
-            const settings = Storage.get("settings") || {};
+        set(key, value) {
+            const settings = Storage.get('settings') || {};
             settings[key] = value;
-            Storage.set("settings", settings);
+            Storage.set('settings', settings);
         },
 
-        get: function(key) {
-            const settings = Storage.get("settings");
+        get(key) {
+            const settings = Storage.get('settings');
             if (settings) {
                 return settings[key];
             }
+            return undefined;
         },
 
-        remove: function(key) {
-            const settings = Storage.get("settings");
+        remove(key) {
+            const settings = Storage.get('settings');
             if (settings) {
                 delete settings[key];
             }
         },
 
-        clear: function() {
-            Storage.remove("settings");
+        clear() {
+            Storage.remove('settings');
         },
 
-        setPassword: function(username, password) {
+        setPassword(username, password) {
             keychain.setPassword({
                 account: username,
                 service: Workflow.getName(),
-                password: password
-            }, function(err) {
+                password,
+            }, (err) => {
                 console.log(err);
             });
         },
 
-        getPassword: function(username, callback) {
+        getPassword(username, callback) {
             keychain.getPassword({
                 account: username,
-                service: Workflow.getName()
+                service: Workflow.getName(),
             }, callback);
-        }
+        },
     };
-})();
+}());
 
 // === Utils
 const Utils = (function() {
-    const fuzzy = require('fuzzy');
-    const applescript = require('node-osascript');
     return {
-        SUB_ACTION_SEPARATOR: " $>",
+        SUB_ACTION_SEPARATOR: ' $>',
 
-        filter: function(query, list, keyBuilder) {
+        filter(query, list, keyBuilder) {
             if (!query) {
                 return list;
             }
 
             const options = {
-                extract: keyBuilder
+                extract: keyBuilder,
             };
 
-            return fuzzy.filter(query, list, options).map(function(item) {
-                return item.original;
-            });
+            return fuzzy.filter(query, list, options).map((item) => item.original);
         },
 
         /**
@@ -334,7 +330,7 @@ const Utils = (function() {
              * @param script
              * @param handler: function(err, result)
              */
-            execute: function(script, handler) {
+            execute(script, handler) {
                 applescript.execute(script, handler);
             },
 
@@ -344,19 +340,20 @@ const Utils = (function() {
              * @param variable variable
              * @param handler: function(err, result, raw)
              */
-            executeFile: function(path, varibale, handler) {
+            // eslint-disable-next-line no-unused-vars
+            executeFile(path, varibale, handler) {
+                // eslint-disable-next-line prefer-rest-params
                 applescript.executeFile.apply(this, arguments);
-            }
+            },
         },
-
 
         /**
          * @param data: {arg: 'xyz', variables: {key: value}}
-         * @return 
+         * @return
          *     string of '{"alfredworkflow": {"arg": "xyz", "variables": {"key": "value"}}}'
          *     or data if data is not type of object
          */
-        generateVars: function(data) {
+        generateVars(data) {
             const ret = _updateArg(data);
             console.log(ret);
             return ret;
@@ -367,7 +364,7 @@ const Utils = (function() {
              * Set enviroment variable
              * if value is object => store as json string
              */
-            set: function(key, value) {
+            set(key, value) {
                 if (key !== undefined && value !== undefined) {
                     if (typeof value === 'object') {
                         process.env.key = JSON.stringify(value);
@@ -381,9 +378,9 @@ const Utils = (function() {
              * Get enviroment variable
              * if data is json => parse and return object
              */
-            get: function(key) {
+            get(key) {
                 return _toObjectIfJSONString(process.env[key]);
-            }
+            },
         },
 
         wfVars: {
@@ -393,25 +390,23 @@ const Utils = (function() {
              * @param value variable value
              * @param callback callback(err)
              */
-            set: function(key, value, callback) {
+            set(key, value, callback) {
                 if (key !== undefined && value !== undefined) {
                     // set variable to plist
-                    const setCommand = utils.format('/usr/libexec/PlistBuddy -c "Set :variables:%s \"%s\"" info.plist', key, value);
-                    exec(setCommand, function(err, stdout, stderr) {
+                    const setCommand = utils.format('/usr/libexec/PlistBuddy -c "Set :variables:%s "%s"" info.plist', key, value);
+                    exec(setCommand, (err) => {
                         // if variable is not in plist => add it to plist
                         if (err) {
-                            const addCommand = utils.format('/usr/libexec/PlistBuddy -c "Add :variables:%s string \"%s\"" info.plist', key, value);
-                            exec(addCommand, function(err, stdout, stderr) {
+                            const addCommand = utils.format('/usr/libexec/PlistBuddy -c "Add :variables:%s string "%s"" info.plist', key, value);
+                            exec(addCommand, (e) => {
                                 if (callback) {
-                                    callback(_toUndefinedIfNull(err));
-                                };
+                                    callback(_toUndefinedIfNull(e));
+                                }
                             });
-                        } else {
-                            if (callback) {
-                                callback(undefined);
-                            };
+                        } else if (callback) {
+                            callback(undefined);
                         }
-                    })
+                    });
                 }
             },
 
@@ -420,17 +415,16 @@ const Utils = (function() {
              * @param callback callback(err, value)
              * @return wf variable
              */
-            get: function(key, callback) {
+            get(key, callback) {
                 const getCommand = utils.format('/usr/libexec/PlistBuddy -c "Print :variables:%s" info.plist', key);
-                exec(getCommand, function(err, stdout, stderr) {
+                exec(getCommand, (err, stdout) => {
                     if (err) {
                         callback(err);
                     } else {
                         const value = stdout.trim();
                         callback(undefined, value);
                     }
-
-                })
+                });
             },
 
             /**
@@ -438,13 +432,13 @@ const Utils = (function() {
              * @param key variable name
              * @param callback callback(err)
              */
-            remove: function(key, callback) {
+            remove(key, callback) {
                 const getCommand = utils.format('/usr/libexec/PlistBuddy -c "Delete :variables:%s" info.plist', key);
-                exec(getCommand, function(err, stdout, stderr) {
+                exec(getCommand, (err) => {
                     if (callback) {
                         callback(_toUndefinedIfNull(err));
-                    };
-                })
+                    }
+                });
             },
 
             /**
@@ -452,47 +446,47 @@ const Utils = (function() {
              * clear all workflow variables
              * @param callback callback(err)
              */
-            clear: function(callback) {
+            clear(callback) {
                 const clearCommand = '/usr/libexec/PlistBuddy -c "Delete :variables" info.plist';
-                exec(clearCommand, function(err, stdout, stderr) {
+                exec(clearCommand, (err) => {
                     if (callback) {
-                        callback(_toUndefinedIfNull(err))
-                    };
-                })
-            }
-        }
+                        callback(_toUndefinedIfNull(err));
+                    }
+                });
+            },
+        },
 
     };
-})();
+}());
 
 const ICONS = (function() {
     // mac icons root folder
-    const ICON_ROOT = "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/";
+    const ICON_ROOT = '/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/';
 
     return {
-        ACCOUNT: ICON_ROOT + "Accounts.icns",
-        BURN: ICON_ROOT + "BurningIcon.icns",
-        CLOCK: ICON_ROOT + "Clock.icns",
-        COLOR: ICON_ROOT + "ProfileBackgroundColor.icns",
-        EJECT: ICON_ROOT + "EjectMediaIcon.icns",
-        ERROR: ICON_ROOT + "AlertStopIcon.icns",
-        FAVORITE: ICON_ROOT + "ToolbarFavoritesIcon.icns",
-        GROUP: ICON_ROOT + "GroupIcon.icns",
-        HELP: ICON_ROOT + "HelpIcon.icns",
-        HOME: ICON_ROOT + "HomeFolderIcon.icns",
-        INFO: ICON_ROOT + "ToolbarInfo.icns",
-        NETWORK: ICON_ROOT + "GenericNetworkIcon.icns",
-        NOTE: ICON_ROOT + "AlertNoteIcon.icns",
-        SETTINGS: ICON_ROOT + "ToolbarAdvanced.icns",
-        SWIRL: ICON_ROOT + "ErasingIcon.icns",
-        SWITCH: ICON_ROOT + "General.icns",
-        SYNC: ICON_ROOT + "Sync.icns",
-        TRASH: ICON_ROOT + "TrashIcon.icns",
-        USER: ICON_ROOT + "UserIcon.icns",
-        WARNING: ICON_ROOT + "AlertCautionBadgeIcon.icns",
-        WEB: ICON_ROOT + "BookmarkIcon.icns",
+        ACCOUNT: `${ICON_ROOT}Accounts.icns`,
+        BURN: `${ICON_ROOT}BurningIcon.icns`,
+        CLOCK: `${ICON_ROOT}Clock.icns`,
+        COLOR: `${ICON_ROOT}ProfileBackgroundColor.icns`,
+        EJECT: `${ICON_ROOT}EjectMediaIcon.icns`,
+        ERROR: `${ICON_ROOT}AlertStopIcon.icns`,
+        FAVORITE: `${ICON_ROOT}ToolbarFavoritesIcon.icns`,
+        GROUP: `${ICON_ROOT}GroupIcon.icns`,
+        HELP: `${ICON_ROOT}HelpIcon.icns`,
+        HOME: `${ICON_ROOT}HomeFolderIcon.icns`,
+        INFO: `${ICON_ROOT}ToolbarInfo.icns`,
+        NETWORK: `${ICON_ROOT}GenericNetworkIcon.icns`,
+        NOTE: `${ICON_ROOT}AlertNoteIcon.icns`,
+        SETTINGS: `${ICON_ROOT}ToolbarAdvanced.icns`,
+        SWIRL: `${ICON_ROOT}ErasingIcon.icns`,
+        SWITCH: `${ICON_ROOT}General.icns`,
+        SYNC: `${ICON_ROOT}Sync.icns`,
+        TRASH: `${ICON_ROOT}TrashIcon.icns`,
+        USER: `${ICON_ROOT}UserIcon.icns`,
+        WARNING: `${ICON_ROOT}AlertCautionBadgeIcon.icns`,
+        WEB: `${ICON_ROOT}BookmarkIcon.icns`,
     };
-})();
+}());
 
 // === private functions
 function _removeEmptyProperties(data) {
@@ -515,42 +509,42 @@ function _removeEmptyProperties(data) {
 // save item data into storage as "item title" => item data
 function saveItemData(item) {
     if (item.data) {
-        const wfData = Storage.get("wfData") || {};
+        const wfData = Storage.get('wfData') || {};
         wfData[item.title] = item.data;
-        Storage.set("wfData", wfData);
+        Storage.set('wfData', wfData);
     }
 }
 
-function clearItemsData(item) {
-    Storage.remove("wfData");
+function clearItemsData() {
+    Storage.remove('wfData');
 }
 
 function getItemData(itemTitle) {
-    itemTitle = typeof itemTitle === "string" ? itemTitle.normalize() : itemTitle;
-    const wfData = Storage.get("wfData");
+    itemTitle = typeof itemTitle === 'string' ? itemTitle.normalize() : itemTitle;
+    const wfData = Storage.get('wfData');
     return wfData ? wfData[itemTitle] : undefined;
 }
 
 function saveUsage(query, itemTitle) {
     if (!query) {
-        const usage = Storage.get("usage") || {};
+        const usage = Storage.get('usage') || {};
 
         const count = usage[itemTitle] || 0;
         usage[itemTitle] = count + 1;
 
-        Storage.set("usage", usage);
+        Storage.set('usage', usage);
     }
 }
 
 function _updateArg(data) {
-    if (typeof data === "object") {
+    if (typeof data === 'object') {
         const _arg = data.arg;
         const _variables = data.variables;
         return JSON.stringify({
             alfredworkflow: {
                 arg: _arg,
-                variables: _variables
-            }
+                variables: _variables,
+            },
         });
     }
 
@@ -581,12 +575,12 @@ module.exports = {
     workflow: Workflow,
     actionHandler: ActionHandler,
     settings: Settings,
-    Item: Item,
+    Item,
     utils: Utils,
-    ICONS: ICONS,
-    run: function() {
+    ICONS,
+    run() {
         const action = process.argv[2];
         const query = process.argv[3];
         ActionHandler.handle(action, query);
-    }
+    },
 };
