@@ -330,7 +330,7 @@ You can look at some tests in test folder in source code get more about usage
 ## Source code and document
 https://github.com/giangvo/alfred-workflow-nodejs
 
-## Release notes (Alfred 2)
+## Release notes
 * 0.x.x -> 1.x.x : for Alfred 2 workflow
 * 2.0: Alfred 3 workflow
     * Return feedback as JSON
@@ -340,3 +340,4 @@ https://github.com/giangvo/alfred-workflow-nodejs
     * Add: Utils.wfVars with set/get/remove/clear to set/get/remove/clear wf variables
 * 2.0.1: Use "node-persist" version 0.0.11 (latest version of "node-persist" is not compatible with this lib)
 * 2.0.3: Fix vulnerabable dependencies.
+* 2.0.4: Upgrade dependencies.
